@@ -1,41 +1,152 @@
 import express from 'express'
+import { protect } from '../middleware.js'
 import Course from '../models/Course.js'
+import CourseProgress from '../models/CourseProgress.js'
+import Enrollment from '../models/Enrollment.js'
+import Assessment from '../models/Assessment.js'
 
 const router = express.Router()
 
+// GET /api/courses - List all courses
 router.get('/', async (req, res) => {
-  const courses = await Course.find().lean()
-  res.json(courses)
+  try {
+    const courses = await Course.find().lean()
+    res.json(courses)
+  } catch (error) {
+    console.error('Fetch courses error:', error)
+    res.status(500).json({ message: 'Server error fetching courses' })
+  }
 })
 
-router.get('/:id/modules', async (req, res) => {
-  const course = await Course.findOne({ id: req.params.id }).lean()
-  if (!course) return res.status(404).json({ message: 'Course not found' })
+// GET /api/courses/:id/modules - Get user-specific progress & modules lock status
+router.get('/:id/modules', protect, async (req, res) => {
+  try {
+    const courseId = req.params.id
+    const learnerId = req.user.id
 
-  delete course._id
-  delete course.__v
+    const course = await Course.findOne({ id: courseId }).lean()
+    if (!course) {
+      return res.status(404).json({ message: 'Course not found' })
+    }
 
-  res.json(course)
+    // Get or initialize user's course progress
+    let courseProgress = await CourseProgress.findOne({ learnerId, courseId })
+    if (!courseProgress) {
+      courseProgress = await CourseProgress.create({
+        id: 'cp_' + courseId + '_' + learnerId,
+        learnerId,
+        courseId,
+        progress: 0,
+        preTestPassed: false,
+        postTestPassed: false,
+        completedModules: [],
+        unlockedModules: [],
+        status: 'not_started'
+      })
+    }
+
+    // Identify pre-test and post-test assessments in database
+    const preTest = await Assessment.findOne({ courseId, type: 'pre-test' }).lean()
+    const postTest = await Assessment.findOne({ courseId, type: 'post-test' }).lean()
+
+    // Ensure the first module is unlocked if pre-test has been passed, even if unlockedModules was empty
+    if (courseProgress.preTestPassed && courseProgress.unlockedModules.length === 0 && course.modules?.length > 0) {
+      courseProgress.unlockedModules.push(course.modules[0].id)
+      await courseProgress.save()
+    }
+
+    // Map modules and determine locks/completions dynamically per user
+    const modulesMapped = (course.modules || []).map((m, index) => {
+      // Locked if pre-test not passed, OR if not in unlockedModules list
+      const isLocked = !courseProgress.preTestPassed || !courseProgress.unlockedModules.includes(m.id)
+      return {
+        ...m,
+        completed: courseProgress.completedModules.includes(m.id),
+        locked: isLocked
+      }
+    })
+
+    res.json({
+      id: course.id,
+      programId: course.programId,
+      name: course.name,
+      description: course.description,
+      progress: courseProgress.progress,
+      preTestPassed: courseProgress.preTestPassed,
+      postTestPassed: courseProgress.postTestPassed,
+      preTestId: preTest?.id || `${courseId}-pretest`,
+      postTestId: postTest?.id || `${courseId}-posttest`,
+      modules: modulesMapped
+    })
+  } catch (error) {
+    console.error('Fetch modules error:', error)
+    res.status(500).json({ message: 'Server error fetching modules' })
+  }
 })
 
-router.post('/:id/modules/:moduleId/complete', async (req, res) => {
-  const course = await Course.findOne({ id: req.params.id })
-  if (!course) return res.status(404).json({ message: 'Course not found' })
+// POST /api/courses/:id/modules/:moduleId/complete - Deprecated in favor of quiz grading,
+// but kept for compatibility or fallback, updating CourseProgress and Enrollment
+router.post('/:id/modules/:moduleId/complete', protect, async (req, res) => {
+  try {
+    const courseId = req.params.id
+    const { moduleId } = req.params
+    const learnerId = req.user.id
 
-  const mod = course.modules.find(m => m.id === req.params.moduleId)
-  if (!mod) return res.status(404).json({ message: 'Module not found' })
+    const course = await Course.findOne({ id: courseId })
+    if (!course) return res.status(404).json({ message: 'Course not found' })
 
-  mod.completed = true
+    const mod = course.modules.find(m => m.id === moduleId)
+    if (!mod) return res.status(404).json({ message: 'Module not found' })
 
-  const completed = course.modules.filter(m => m.completed).length
-  course.progress = Math.round((completed / course.modules.length) * 100)
+    let courseProgress = await CourseProgress.findOne({ learnerId, courseId })
+    if (!courseProgress) {
+      courseProgress = await CourseProgress.create({
+        id: 'cp_' + courseId + '_' + learnerId,
+        learnerId,
+        courseId,
+        progress: 0,
+        preTestPassed: true, // Auto-pass pre-test in complete fallback
+        postTestPassed: false,
+        completedModules: [moduleId],
+        unlockedModules: [moduleId],
+        status: 'in_progress'
+      })
+    } else {
+      if (!courseProgress.completedModules.includes(moduleId)) {
+        courseProgress.completedModules.push(moduleId)
+      }
+    }
 
-  const next = course.modules.find(m => !m.completed)
-  if (next) next.locked = false
+    // Unlock next module
+    const currentIndex = course.modules.findIndex(m => m.id === moduleId)
+    if (currentIndex !== -1 && currentIndex < course.modules.length - 1) {
+      const nextMod = course.modules[currentIndex + 1]
+      if (!courseProgress.unlockedModules.includes(nextMod.id)) {
+        courseProgress.unlockedModules.push(nextMod.id)
+      }
+    }
 
-  await course.save()
+    const completed = courseProgress.completedModules.length
+    const progressPercent = Math.round((completed / course.modules.length) * 100)
+    courseProgress.progress = progressPercent
+    if (progressPercent >= 100 && courseProgress.preTestPassed && courseProgress.postTestPassed) {
+      courseProgress.status = 'completed'
+    } else {
+      courseProgress.status = 'in_progress'
+    }
+    await courseProgress.save()
 
-  res.json({ success: true, progress: course.progress })
+    // Update legacy Enrollment progress
+    await Enrollment.updateOne(
+      { learnerId, courseId },
+      { $set: { progress: progressPercent } }
+    )
+
+    res.json({ success: true, progress: progressPercent })
+  } catch (error) {
+    console.error('Complete module error:', error)
+    res.status(500).json({ message: 'Server error completing module' })
+  }
 })
 
 export default router

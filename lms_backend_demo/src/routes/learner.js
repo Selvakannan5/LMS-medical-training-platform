@@ -1,35 +1,62 @@
 import express from 'express'
-import Enrollment from '../models/Enrollment.js'
+import { protect } from '../middleware.js'
+import CourseProgress from '../models/CourseProgress.js'
 import Course from '../models/Course.js'
+import Program from '../models/Program.js'
 import { Certificate, Simulation, Notification } from '../models/SimpleModels.js'
 
 const router = express.Router()
 
-router.get('/dashboard', async (req, res) => {
-  const learnerId = 'u1'
+router.get('/dashboard', protect, async (req, res) => {
+  try {
+    const learnerId = req.user.id
 
-  const enrollments = await Enrollment.find({ learnerId }).lean()
-  const courses = await Promise.all(
-    enrollments.map(async (e) => {
-      const course = await Course.findOne({ id: e.courseId }).lean()
-      return {
-        id: e.id,
-        courseId: e.courseId,
-        courseName: course?.name,
-        programCode: course?.programId === 'p4' ? 'NALS' : 'PALS',
-        progress: e.progress || 0,
-        nextModule: e.nextModule,
-        status: e.status || 'in_progress',
-      }
+    const progressRecords = await CourseProgress.find({ learnerId }).lean()
+    const coursesMapped = await Promise.all(
+      progressRecords.map(async (cp) => {
+        const course = await Course.findOne({ id: cp.courseId }).lean()
+        const program = await Program.findOne({ id: course?.programId }).lean()
+        
+        let nextModuleTitle = 'Not Started'
+        if (course && course.modules) {
+          if (!cp.preTestPassed) {
+            nextModuleTitle = 'Pre-Test'
+          } else {
+            const nextMod = course.modules.find(m => !cp.completedModules.includes(m.id))
+            if (nextMod) {
+              nextModuleTitle = nextMod.title
+            } else if (!cp.postTestPassed) {
+              nextModuleTitle = 'Post-Test'
+            } else {
+              nextModuleTitle = 'Completed'
+            }
+          }
+        }
+
+        return {
+          id: cp.id,
+          courseId: cp.courseId,
+          courseName: course?.name || 'Medical Training Course',
+          programCode: program?.code || 'MED',
+          progress: cp.progress || 0,
+          nextModule: nextModuleTitle,
+          status: cp.status || 'not_started',
+          preTestPassed: cp.preTestPassed,
+          postTestPassed: cp.postTestPassed
+        }
+      })
+    )
+
+    res.json({
+      courses: coursesMapped,
+      simulations: await Simulation.find().lean(),
+      certificates: await Certificate.find({ learnerId }).lean(),
+      notifications: await Notification.find().lean(),
     })
-  )
-
-  res.json({
-    courses,
-    simulations: await Simulation.find().lean(),
-    certificates: await Certificate.find({ learnerId }).lean(),
-    notifications: await Notification.find().lean(),
-  })
+  } catch (error) {
+    console.error('Fetch dashboard error:', error)
+    res.status(500).json({ message: 'Server error loading dashboard' })
+  }
 })
 
 export default router
