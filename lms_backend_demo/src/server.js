@@ -6,6 +6,7 @@ import authRoutes from './routes/auth.js'
 import learnerRoutes from './routes/learner.js'
 import courseRoutes from './routes/courses.js'
 import assessmentRoutes from './routes/assessments.js'
+import moduleRoutes from './routes/modules.js'
 import adminRoutes from './routes/admin.js'
 import facultyRoutes from './routes/faculty.js'
 import aiRoutes from './routes/ai.js'
@@ -34,6 +35,7 @@ app.use('/api/auth', authRoutes)
 app.use('/api/learner', learnerRoutes)
 app.use('/api/courses', courseRoutes)
 app.use('/api/assessments', assessmentRoutes)
+app.use('/api/modules', moduleRoutes)
 app.use('/api/admin', adminRoutes)
 app.use('/api/faculty', facultyRoutes)
 app.use('/api/ai', aiRoutes)

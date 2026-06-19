@@ -1,5 +1,5 @@
 import React, { useState } from 'react'
-import { useNavigate, useLocation } from 'react-router-dom'
+import { useNavigate, useLocation, Link } from 'react-router-dom'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { z } from 'zod'
@@ -12,12 +12,6 @@ const schema = z.object({
   password: z.string().min(6, 'Password must be at least 6 characters'),
 })
 
-const DEMO_ACCOUNTS = [
-  { role: 'Learner', email: 'learner@demo.com', color: 'bg-blue-50 border-blue-200 text-blue-700' },
-  { role: 'Faculty', email: 'faculty@demo.com', color: 'bg-purple-50 border-purple-200 text-purple-700' },
-  { role: 'Admin', email: 'admin@demo.com', color: 'bg-slate-50 border-slate-200 text-slate-700' },
-]
-
 export default function LoginPage() {
   const { login } = useAuth()
   const toast = useToast()
@@ -25,7 +19,7 @@ export default function LoginPage() {
   const location = useLocation()
   const [loading, setLoading] = useState(false)
 
-  const { register, handleSubmit, setValue, formState: { errors } } = useForm({
+  const { register, handleSubmit, formState: { errors } } = useForm({
     resolver: zodResolver(schema),
   })
 
@@ -43,11 +37,6 @@ export default function LoginPage() {
     } finally {
       setLoading(false)
     }
-  }
-
-  const fillDemo = (email) => {
-    setValue('email', email)
-    setValue('password', 'MedTrain@123')
   }
 
   return (
@@ -141,23 +130,11 @@ export default function LoginPage() {
               </button>
             </form>
 
-            {/* Demo accounts */}
-            <div className="mt-6 pt-5 border-t border-slate-100">
-              <p className="text-xs font-medium text-slate-500 mb-3 text-center">Demo accounts — password: MedTrain@123</p>
-              <div className="space-y-2">
-                {DEMO_ACCOUNTS.map((acc) => (
-                  <button
-                    key={acc.role}
-                    type="button"
-                    onClick={() => fillDemo(acc.email)}
-                    className={`w-full flex items-center justify-between px-3 py-2.5 rounded-lg border text-xs font-medium transition-colors hover:opacity-80 ${acc.color}`}
-                    id={`demo-${acc.role.toLowerCase()}`}
-                  >
-                    <span className="font-semibold">{acc.role}</span>
-                    <span className="opacity-70">{acc.email}</span>
-                  </button>
-                ))}
-              </div>
+            <div className="mt-6 pt-5 border-t border-slate-100 text-center text-sm">
+              <span className="text-slate-500">Don't have an account? </span>
+              <Link to="/register" className="text-blue-600 hover:underline font-semibold" id="register-link">
+                Create Account
+              </Link>
             </div>
           </div>
 

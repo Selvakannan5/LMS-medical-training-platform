@@ -12,14 +12,6 @@ const navItems = [
       { to: '/learner/profile',                 icon: '👤', label: 'Profile',      id: 'learner-profile'   },
     ],
   },
-  {
-    label: 'Learning',
-    items: [
-      { to: '/learner/assessment/a1', icon: '📝', label: 'Pre-Test (BLS)',   id: 'learner-pretest'  },
-      { to: '/learner/assessment/a2', icon: '📋', label: 'Post-Test (BLS)',  id: 'learner-posttest' },
-      { to: '/learner/osce/s1/u1',    icon: '🩺', label: 'OSCE Results',    id: 'learner-osce'     },
-    ],
-  },
 ]
 
 export default function LearnerLayout() {

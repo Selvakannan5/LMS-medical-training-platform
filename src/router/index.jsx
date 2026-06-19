@@ -8,6 +8,7 @@ import AdminLayout   from '@/components/layouts/AdminLayout'
 
 // Auth
 const LoginPage = lazy(() => import('@/pages/auth/LoginPage'))
+const RegisterPage = lazy(() => import('@/pages/auth/RegisterPage'))
 
 // Learner
 const LearnerDashboard  = lazy(() => import('@/pages/learner/Dashboard'))
@@ -48,6 +49,14 @@ export const router = createBrowserRouter([
     element: (
       <Suspense fallback={<Fallback />}>
         <LoginPage />
+      </Suspense>
+    ),
+  },
+  {
+    path: '/register',
+    element: (
+      <Suspense fallback={<Fallback />}>
+        <RegisterPage />
       </Suspense>
     ),
   },
