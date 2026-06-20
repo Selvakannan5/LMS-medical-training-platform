@@ -248,7 +248,13 @@ export default function LearnerDashboard() {
                 {notifications.slice(0, 3).map((n) => (
                   <div key={n.id} className="bg-amber-50/50 border border-amber-100 rounded-xl p-3 flex gap-2">
                     <span className="text-amber-500">🔔</span>
-                    <p className="text-xs text-amber-800 font-medium">{n.message}</p>
+                    {n.link ? (
+                      <Link to={n.link} className="text-xs text-amber-800 font-medium hover:underline flex-1">
+                        {n.message}
+                      </Link>
+                    ) : (
+                      <p className="text-xs text-amber-800 font-medium">{n.message}</p>
+                    )}
                   </div>
                 ))}
               </div>

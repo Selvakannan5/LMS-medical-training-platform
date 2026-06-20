@@ -4,6 +4,7 @@ import Course from '../models/Course.js'
 import CourseProgress from '../models/CourseProgress.js'
 import Enrollment from '../models/Enrollment.js'
 import Assessment from '../models/Assessment.js'
+import { AIFeedback } from '../models/SimpleModels.js'
 
 const router = express.Router()
 
@@ -65,6 +66,8 @@ router.get('/:id/modules', protect, async (req, res) => {
       }
     })
 
+    const aiFeedbackRecord = await AIFeedback.findOne({ learnerId, courseId }).sort({ createdAt: -1 }).lean()
+
     res.json({
       id: course.id,
       programId: course.programId,
@@ -75,7 +78,8 @@ router.get('/:id/modules', protect, async (req, res) => {
       postTestPassed: courseProgress.postTestPassed,
       preTestId: null,
       postTestId: postTest?.id || `${courseId}-posttest`,
-      modules: modulesMapped
+      modules: modulesMapped,
+      aiFeedback: aiFeedbackRecord ? aiFeedbackRecord.feedback : null
     })
   } catch (error) {
     console.error('Fetch modules error:', error)

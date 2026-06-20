@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react'
-import { useParams, Link } from 'react-router-dom'
+import { useParams, Link, useNavigate } from 'react-router-dom'
 import { useQuery, useMutation } from '@tanstack/react-query'
 import api from '@/lib/axios'
 import { LoadingSpinner } from '@/components/shared/LoadingSpinner'
@@ -8,10 +8,16 @@ import { useToast } from '@/context/ToastContext'
 export default function FeedbackGenerator() {
   const { learnerId } = useParams()
   const toast = useToast()
+  const navigate = useNavigate()
   const [selectedCourseId, setSelectedCourseId] = useState('')
   const [feedback, setFeedback] = useState('')
   const [editedFeedback, setEditedFeedback] = useState('')
   const [isEditing, setIsEditing] = useState(false)
+
+  const { data: learners = [] } = useQuery({
+    queryKey: ['faculty-learners'],
+    queryFn: () => api.get('/faculty/learners').then(r => r.data),
+  })
 
   const { data: learnerData, isLoading: learnerLoading } = useQuery({
     queryKey: ['learner-detail', learnerId],
@@ -64,8 +70,15 @@ ${res.actionPlan.map(a => `- ${a}`).join('\n')}`
   })
 
   const sendMutation = useMutation({
-    mutationFn: () => Promise.resolve({ success: true }),
+    mutationFn: () => api.post('/faculty/feedback/send', { 
+      learnerId, 
+      courseId: selectedCourseId, 
+      feedback: editedFeedback 
+    }).then(r => r.data),
     onSuccess: () => toast.success('Feedback sent to learner!'),
+    onError: (err) => {
+      toast.error(err.response?.data?.message || 'Failed to send feedback')
+    }
   })
 
   if (learnerLoading || coursesLoading) return <div className="flex items-center justify-center h-64"><LoadingSpinner size="lg" /></div>
@@ -102,9 +115,27 @@ ${res.actionPlan.map(a => `- ${a}`).join('\n')}`
             <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-blue-500 to-blue-700 flex items-center justify-center text-white font-bold text-lg">
               {user.name.split(' ').map(n => n[0]).slice(0, 2).join('')}
             </div>
-            <div>
+            <div className="flex-1 min-w-0">
               <h1 className="text-xl font-bold text-slate-800">{user.name}</h1>
-              <p className="text-slate-500 text-sm">{user.department} · {user.email}</p>
+              <div className="flex items-center gap-2 mt-1 flex-wrap">
+                <span className="text-slate-500 text-sm font-medium">{user.department} · {user.email}</span>
+                <span className="text-slate-300">|</span>
+                <span className="text-xs font-semibold text-slate-500 uppercase tracking-wider">Switch Learner:</span>
+                <select
+                  value={learnerId}
+                  onChange={(e) => {
+                    navigate(`/faculty/feedback/${e.target.value}`)
+                    setFeedback('')
+                    setEditedFeedback('')
+                  }}
+                  className="px-2.5 py-1 border border-slate-200 rounded-xl text-xs focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white font-semibold text-slate-700 shadow-sm outline-none transition-all hover:bg-slate-50 cursor-pointer"
+                  id="feedback-learner-select"
+                >
+                  {learners.map(l => (
+                    <option key={l.learnerId} value={l.learnerId}>{l.name} ({l.department})</option>
+                  ))}
+                </select>
+              </div>
             </div>
           </div>
 

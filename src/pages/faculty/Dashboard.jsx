@@ -36,6 +36,7 @@ export default function FacultyDashboard() {
     averageScore = 0,
     passRate = 0,
     pendingReviews = 0,
+    pendingLearnerIds = [],
     recentResults = [],
     upcomingSimulations = [],
     coursePerformance = [],
@@ -72,7 +73,7 @@ export default function FacultyDashboard() {
             <p className="text-xs text-amber-600">Please evaluate clinical skill steps for learners under your supervision.</p>
           </div>
           <Link
-            to="/faculty/osce/s1/u1"
+            to={`/faculty/osce/s1/${pendingLearnerIds[0] || 'u1'}`}
             className="px-4 py-2 bg-amber-500 hover:bg-amber-600 text-white text-xs font-bold rounded-xl transition-all shadow-sm cursor-pointer"
             id="pending-osce-link"
           >

@@ -226,6 +226,23 @@ function ModuleQuizSection({ moduleId, onQuizPassed }) {
   )
 }
 
+const formatFeedback = (text) => {
+  if (!text) return null
+  return text.split('\n').map((line, i) => {
+    if (line.startsWith('**') && line.endsWith('**')) {
+      return <h3 key={i} className="font-bold text-slate-800 mt-4 mb-1 first:mt-0">{line.replace(/\*\*/g, '')}</h3>
+    }
+    if (line.startsWith('- ')) {
+      return <li key={i} className="text-slate-600 text-sm ml-4 mb-0.5">{line.slice(2)}</li>
+    }
+    if (line.startsWith('*')) {
+      return <p key={i} className="text-xs text-slate-400 italic mt-2">{line.replace(/\*/g, '')}</p>
+    }
+    if (line.trim() === '') return <br key={i} />
+    return <p key={i} className="text-slate-600 text-sm mb-1">{line}</p>
+  })
+}
+
 export default function CourseView() {
   const { id } = useParams()
   const toast = useToast()
@@ -373,12 +390,50 @@ export default function CourseView() {
                   <p className="text-[10px] text-slate-400 font-medium">Certificate Eligibility</p>
                 </div>
               </button>
+
+              {/* AI Feedback Item */}
+              {course.aiFeedback && (
+                <button
+                  onClick={() => setCurrentModuleId('aifeedback')}
+                  className={`w-full flex items-center gap-3 px-4 py-3.5 text-left transition-colors text-xs font-semibold cursor-pointer hover:bg-slate-50
+                    ${currentModuleId === 'aifeedback' ? 'bg-blue-50 text-blue-800' : 'text-slate-700'}
+                  `}
+                  id="course-flow-ai-feedback"
+                >
+                  <div className="w-5 h-5 rounded-full flex-shrink-0 flex items-center justify-center text-[10px] bg-blue-100 text-blue-600">
+                    🤖
+                  </div>
+                  <div className="min-w-0 flex-1">
+                    <p className="truncate font-semibold">AI Performance Analysis</p>
+                    <p className="text-[10px] text-slate-400 font-medium">Diagnostic Feedback</p>
+                  </div>
+                </button>
+              )}
             </div>
           </div>
         </div>
 
         {/* Right Content Panel */}
         <div className="lg:col-span-3">
+
+          {/* PANEL 4: AI Feedback Block */}
+          {currentModuleId === 'aifeedback' && course.aiFeedback && (
+            <div className="bg-white border border-slate-100 rounded-2xl p-6 shadow-sm space-y-4">
+              <div className="border-b border-slate-100 pb-3">
+                <h2 className="text-lg font-bold text-slate-800 flex items-center gap-2">
+                  <span>🤖</span> AI Performance Feedback
+                </h2>
+                <p className="text-xs text-slate-500 mt-1">Rule-based clinical diagnostic feedback based on your test results.</p>
+              </div>
+              <div className="bg-gradient-to-br from-blue-50/30 to-purple-50/30 border border-blue-100/80 rounded-xl p-5 min-h-48">
+                <div className="prose prose-sm max-w-none">
+                  <div className="list-none p-0 m-0 space-y-1">
+                    {formatFeedback(course.aiFeedback)}
+                  </div>
+                </div>
+              </div>
+            </div>
+          )}
 
           {/* PANEL 2: Post-Test Block */}
           {showPostTestPanel && (

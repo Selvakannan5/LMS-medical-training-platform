@@ -1,14 +1,16 @@
 import React from 'react'
+import { Link } from 'react-router-dom'
 import { useQuery } from '@tanstack/react-query'
 import api from '@/lib/axios'
 import { useAuth } from '@/context/AuthContext'
 import { format } from 'date-fns'
 
 const typeIcons = {
-  renewal:     '🔔',
-  test_result: '📋',
-  session:     '📅',
-  default:     '📢',
+  renewal:         '🔔',
+  test_result:     '📋',
+  session:         '📅',
+  osce_evaluation: '🩺',
+  default:         '📢',
 }
 
 export function NotificationDrawer({ isOpen, onClose }) {
@@ -57,9 +59,19 @@ export function NotificationDrawer({ isOpen, onClose }) {
                 <div className="flex gap-3">
                   <span className="text-xl flex-shrink-0 mt-0.5">{typeIcons[n.type] || typeIcons.default}</span>
                   <div className="flex-1 min-w-0">
-                    <p className={`text-sm ${!n.read ? 'font-semibold text-slate-800' : 'text-slate-700'}`}>
-                      {n.message}
-                    </p>
+                    {n.link ? (
+                      <Link
+                        to={n.link}
+                        onClick={onClose}
+                        className={`text-sm hover:underline block ${!n.read ? 'font-semibold text-slate-800' : 'text-slate-700'}`}
+                      >
+                        {n.message}
+                      </Link>
+                    ) : (
+                      <p className={`text-sm ${!n.read ? 'font-semibold text-slate-800' : 'text-slate-700'}`}>
+                        {n.message}
+                      </p>
+                    )}
                     <p className="text-xs text-slate-400 mt-0.5">
                       {format(new Date(n.createdAt), 'MMM d, yyyy · h:mm a')}
                     </p>
