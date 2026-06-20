@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import { useParams, Link } from 'react-router-dom'
 import { useQuery, useMutation } from '@tanstack/react-query'
 import api from '@/lib/axios'
@@ -8,23 +8,59 @@ import { useToast } from '@/context/ToastContext'
 export default function FeedbackGenerator() {
   const { learnerId } = useParams()
   const toast = useToast()
+  const [selectedCourseId, setSelectedCourseId] = useState('')
   const [feedback, setFeedback] = useState('')
   const [editedFeedback, setEditedFeedback] = useState('')
   const [isEditing, setIsEditing] = useState(false)
 
-  const { data, isLoading } = useQuery({
+  const { data: learnerData, isLoading: learnerLoading } = useQuery({
     queryKey: ['learner-detail', learnerId],
     queryFn: () => api.get(`/faculty/learner/${learnerId}`).then(r => r.data),
   })
 
+  const { data: courses = [], isLoading: coursesLoading } = useQuery({
+    queryKey: ['courses-list'],
+    queryFn: () => api.get('/courses').then(r => r.data),
+  })
+
+  const { user, enrollments = [], certificates = [] } = learnerData || {}
+
+  useEffect(() => {
+    if (enrollments.length > 0 && !selectedCourseId) {
+      setSelectedCourseId(enrollments[0].courseId)
+    }
+  }, [enrollments, selectedCourseId])
+
   const generateMutation = useMutation({
-    mutationFn: () => api.post('/ai/feedback', { learnerId }).then(r => r.data),
-    onSuccess: (data) => {
-      setFeedback(data.feedback)
-      setEditedFeedback(data.feedback)
+    mutationFn: () => api.post('/faculty/feedback/generate', { 
+      learnerId, 
+      courseId: selectedCourseId 
+    }).then(r => r.data),
+    onSuccess: (res) => {
+      const formattedText = `**Overall Status: ${res.overallStatus}** (${res.averageScore}% Average Score)
+
+**Strengths**
+${res.strengths.map(s => `- ${s}`).join('\n')}
+
+**Weak Areas**
+${res.weakAreas.map(w => `- ${w}`).join('\n')}
+
+**Recommended Modules**
+${res.recommendedModules.map(m => `- ${m}`).join('\n')}
+
+**Faculty Feedback**
+${res.facultyFeedback}
+
+**Action Plan**
+${res.actionPlan.map(a => `- ${a}`).join('\n')}`
+
+      setFeedback(formattedText)
+      setEditedFeedback(formattedText)
       toast.success('AI feedback generated!')
     },
-    onError: () => toast.error('Failed to generate feedback'),
+    onError: (err) => {
+      toast.error(err.response?.data?.message || 'Failed to generate feedback')
+    },
   })
 
   const sendMutation = useMutation({
@@ -32,9 +68,7 @@ export default function FeedbackGenerator() {
     onSuccess: () => toast.success('Feedback sent to learner!'),
   })
 
-  if (isLoading) return <div className="flex items-center justify-center h-64"><LoadingSpinner size="lg" /></div>
-
-  const { user, enrollments = [], certificates = [] } = data || {}
+  if (learnerLoading || coursesLoading) return <div className="flex items-center justify-center h-64"><LoadingSpinner size="lg" /></div>
 
   const formatFeedback = (text) => {
     if (!text) return null
@@ -92,30 +126,53 @@ export default function FeedbackGenerator() {
       )}
 
       {/* AI Feedback generator */}
-      <div className="bg-white rounded-2xl shadow-sm border border-slate-100 p-5">
-        <div className="flex items-center justify-between mb-4">
+      <div className="bg-white rounded-2xl shadow-sm border border-slate-100 p-5 space-y-5">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-slate-100 pb-4">
           <div>
-            <h2 className="font-bold text-slate-800">AI-Generated Feedback</h2>
-            <p className="text-xs text-slate-500 mt-0.5">Powered by MedTrain AI — personalized based on learner performance data</p>
+            <h2 className="font-bold text-slate-800">AI-Generated Performance Analysis</h2>
+            <p className="text-xs text-slate-500 mt-0.5">Rule-based clinical diagnostic feedback based on latest test results</p>
           </div>
           <button
             id="generate-ai-feedback-btn"
             onClick={() => generateMutation.mutate()}
-            disabled={generateMutation.isPending}
-            className="px-4 py-2.5 bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 disabled:opacity-70 text-white text-sm font-semibold rounded-xl transition-all flex items-center gap-2 shadow-sm"
+            disabled={generateMutation.isPending || !selectedCourseId}
+            className="px-4 py-2.5 bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 disabled:opacity-70 text-white text-sm font-semibold rounded-xl transition-all flex items-center gap-2 shadow-sm cursor-pointer"
           >
             {generateMutation.isPending ? (
-              <><LoadingSpinner size="sm" color="text-white" /> Generating…</>
+              <><LoadingSpinner size="sm" color="text-white" /> Analyzing…</>
             ) : (
-              <><span>🤖</span> Generate AI Feedback</>
+              <><span>🤖</span> Generate Feedback</>
             )}
           </button>
+        </div>
+
+        {/* Course Dropdown */}
+        <div className="w-full md:w-1/2">
+          <label className="block text-xs font-semibold text-slate-500 uppercase mb-1.5">Select Enrolled Course</label>
+          <select
+            value={selectedCourseId}
+            onChange={e => {
+              setSelectedCourseId(e.target.value)
+              setFeedback('')
+              setEditedFeedback('')
+            }}
+            className="w-full px-3 py-2 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white"
+          >
+            {enrollments.map(e => {
+              const c = courses.find(course => course.id === e.courseId)
+              return (
+                <option key={e.courseId} value={e.courseId}>
+                  {c ? c.name : e.courseId}
+                </option>
+              )
+            })}
+          </select>
         </div>
 
         {generateMutation.isPending && (
           <div className="flex flex-col items-center justify-center py-12 gap-3">
             <LoadingSpinner size="lg" color="text-purple-600" />
-            <p className="text-slate-500 text-sm animate-pulse">Analyzing learner performance data…</p>
+            <p className="text-slate-500 text-sm animate-pulse">Running clinical diagnostic rules on assessment data…</p>
           </div>
         )}
 
@@ -124,7 +181,7 @@ export default function FeedbackGenerator() {
             <div className="flex justify-end mb-2">
               <button
                 onClick={() => setIsEditing(!isEditing)}
-                className="text-xs text-slate-400 hover:text-slate-600 transition-colors flex items-center gap-1"
+                className="text-xs text-slate-400 hover:text-slate-600 transition-colors flex items-center gap-1 cursor-pointer"
                 id="edit-feedback-btn"
               >
                 ✎ {isEditing ? 'Preview' : 'Edit'}
@@ -139,11 +196,11 @@ export default function FeedbackGenerator() {
                 id="feedback-editor"
               />
             ) : (
-              <div className="bg-gradient-to-br from-blue-50/50 to-purple-50/50 border border-blue-100 rounded-xl p-5 min-h-48">
+              <div className="bg-gradient-to-br from-blue-50/30 to-purple-50/30 border border-blue-100/80 rounded-xl p-5 min-h-48">
                 <div className="prose prose-sm max-w-none">
-                  <ul className="list-none p-0 m-0">
+                  <div className="list-none p-0 m-0 space-y-1">
                     {formatFeedback(editedFeedback)}
-                  </ul>
+                  </div>
                 </div>
               </div>
             )}
@@ -153,14 +210,14 @@ export default function FeedbackGenerator() {
                 onClick={() => sendMutation.mutate()}
                 disabled={sendMutation.isPending}
                 id="send-feedback-btn"
-                className="px-5 py-2.5 bg-green-600 hover:bg-green-700 disabled:opacity-70 text-white text-sm font-semibold rounded-xl transition-colors flex items-center gap-2"
+                className="px-5 py-2.5 bg-green-600 hover:bg-green-700 disabled:opacity-70 text-white text-sm font-semibold rounded-xl transition-colors flex items-center gap-2 cursor-pointer shadow-sm shadow-green-600/30"
               >
                 {sendMutation.isPending && <LoadingSpinner size="sm" color="text-white" />}
                 ✉ Send to Learner
               </button>
               <button
                 onClick={() => generateMutation.mutate()}
-                className="px-4 py-2.5 border border-slate-200 text-slate-600 text-sm font-medium rounded-xl hover:bg-slate-50 transition-colors"
+                className="px-4 py-2.5 border border-slate-200 text-slate-600 text-sm font-medium rounded-xl hover:bg-slate-50 transition-colors cursor-pointer"
                 id="regenerate-feedback-btn"
               >
                 🔄 Regenerate
@@ -172,7 +229,7 @@ export default function FeedbackGenerator() {
         {!feedback && !generateMutation.isPending && (
           <div className="text-center py-12 text-slate-400">
             <div className="text-5xl mb-3">🤖</div>
-            <p className="text-sm">Click "Generate AI Feedback" to create personalized feedback for this learner</p>
+            <p className="text-sm">Select a course and click "Generate Feedback" to run diagnostic analysis on the learner's test performance.</p>
           </div>
         )}
       </div>
