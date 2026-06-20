@@ -22,6 +22,11 @@ export default function OSCEEvaluation() {
   const toast = useToast()
   const navigate = useNavigate()
 
+  const { data: learners = [] } = useQuery({
+    queryKey: ['faculty-learners'],
+    queryFn: () => api.get('/faculty/learners').then(r => r.data),
+  })
+
   const { data: learnerData, isLoading: learnerLoading } = useQuery({
     queryKey: ['learner-detail', learnerId],
     queryFn: () => api.get(`/faculty/learner/${learnerId}`).then(r => r.data),
@@ -108,9 +113,23 @@ export default function OSCEEvaluation() {
           <div className="w-12 h-12 rounded-2xl bg-purple-100 text-purple-700 flex items-center justify-center text-xl font-bold flex-shrink-0">
             {learnerData?.user?.name?.split(' ').map(n => n[0]).slice(0, 2).join('') || '??'}
           </div>
-          <div>
+          <div className="flex-1 min-w-0">
             <h1 className="text-xl font-bold text-slate-800">OSCE Evaluation Sheet</h1>
-            <p className="text-slate-500 text-sm">{learnerData?.user?.name || 'Loading…'} · {learnerData?.user?.department}</p>
+            <div className="flex items-center gap-2 mt-1.5 flex-wrap">
+              <span className="text-slate-500 text-sm font-medium">{learnerData?.user?.name || 'Loading…'} · {learnerData?.user?.department}</span>
+              <span className="text-slate-300">|</span>
+              <span className="text-xs font-semibold text-slate-500 uppercase tracking-wider">Switch Learner:</span>
+              <select
+                value={learnerId}
+                onChange={(e) => navigate(`/faculty/osce/${sessionId}/${e.target.value}`)}
+                className="px-2.5 py-1 border border-slate-200 rounded-xl text-xs focus:ring-2 focus:ring-purple-500 focus:border-purple-500 bg-white font-semibold text-slate-700 shadow-sm outline-none transition-all hover:bg-slate-50 cursor-pointer"
+                id="osce-learner-select"
+              >
+                {learners.map(l => (
+                  <option key={l.learnerId} value={l.learnerId}>{l.name} ({l.department})</option>
+                ))}
+              </select>
+            </div>
           </div>
           <div className="sm:ml-auto text-left sm:text-right">
             <p className="text-2xl font-bold text-slate-800">{passCount}/{steps.length} Steps Passed</p>

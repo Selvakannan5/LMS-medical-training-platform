@@ -61,12 +61,20 @@ router.get('/dashboard', protect, async (req, res) => {
       }
     }
 
+    const notifications = await Notification.find({
+      $or: [
+        { learnerId },
+        { learnerId: { $exists: false } },
+        { learnerId: null }
+      ]
+    }).sort({ createdAt: -1 }).lean()
+
     res.json({
       courses: coursesMapped,
       availableCourses,
       simulations: await Simulation.find().lean(),
       certificates: await Certificate.find({ learnerId }).lean(),
-      notifications: await Notification.find().lean(),
+      notifications,
     })
   } catch (error) {
     console.error('Fetch dashboard error:', error)
@@ -118,6 +126,24 @@ router.post('/enroll', protect, async (req, res) => {
   } catch (error) {
     console.error('Course enrollment error:', error)
     res.status(500).json({ message: 'Server error enrolling in course' })
+  }
+})
+
+// GET /notifications - Get learner notifications
+router.get('/notifications', protect, async (req, res) => {
+  try {
+    const learnerId = req.user.id
+    const notifications = await Notification.find({
+      $or: [
+        { learnerId },
+        { learnerId: { $exists: false } },
+        { learnerId: null }
+      ]
+    }).sort({ createdAt: -1 }).lean()
+    res.json(notifications)
+  } catch (error) {
+    console.error('Fetch notifications error:', error)
+    res.status(500).json({ message: 'Server error loading notifications' })
   }
 })
 

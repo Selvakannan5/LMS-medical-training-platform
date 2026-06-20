@@ -59,6 +59,38 @@ export default function OSCEView() {
         </div>
       </div>
 
+      {/* Non-Technical Skill Ratings & Comments */}
+      <div className="bg-white rounded-2xl shadow-sm border border-slate-100 p-5 space-y-4">
+        <h3 className="font-bold text-slate-800 text-sm uppercase tracking-wider">Non-Technical Skill Ratings</h3>
+        <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
+          <div className="bg-slate-50 p-3 rounded-xl border border-slate-100 text-center">
+            <p className="text-[10px] font-semibold text-slate-500 uppercase">Communication</p>
+            <p className="text-xl font-bold text-slate-800 mt-1">{data.communicationScore || 0}/10</p>
+          </div>
+          <div className="bg-slate-50 p-3 rounded-xl border border-slate-100 text-center">
+            <p className="text-[10px] font-semibold text-slate-500 uppercase">Technical Skill</p>
+            <p className="text-xl font-bold text-slate-800 mt-1">{data.technicalScore || 0}/10</p>
+          </div>
+          <div className="bg-slate-50 p-3 rounded-xl border border-slate-100 text-center">
+            <p className="text-[10px] font-semibold text-slate-500 uppercase">Decision Making</p>
+            <p className="text-xl font-bold text-slate-800 mt-1">{data.decisionMakingScore || 0}/10</p>
+          </div>
+          <div className="bg-slate-50 p-3 rounded-xl border border-slate-100 text-center">
+            <p className="text-[10px] font-semibold text-slate-500 uppercase">Clinical Safety</p>
+            <p className="text-xl font-bold text-slate-800 mt-1">{data.safetyScore || 0}/10</p>
+          </div>
+        </div>
+
+        {data.comments && (
+          <div className="pt-3 border-t border-slate-100">
+            <h4 className="text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-1">Overall Evaluation Comments</h4>
+            <p className="text-slate-700 text-xs leading-relaxed italic bg-slate-50/50 p-4 rounded-xl border border-slate-100">
+              "{data.comments}"
+            </p>
+          </div>
+        )}
+      </div>
+
       {/* Checklist */}
       <div className="bg-white rounded-2xl shadow-sm border border-slate-100 overflow-hidden">
         <div className="px-5 py-3 border-b border-slate-100">

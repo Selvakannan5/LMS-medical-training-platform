@@ -6,7 +6,7 @@ import Enrollment from '../models/Enrollment.js'
 import Assessment from '../models/Assessment.js'
 import Result from '../models/Results.js'
 import OSCEEvaluation from '../models/OSCEEvaluation.js'
-import { Batch, Certificate, Simulation } from '../models/SimpleModels.js'
+import { Batch, Certificate, Simulation, Notification, AIFeedback } from '../models/SimpleModels.js'
 import { protect } from '../middleware.js'
 
 const router = express.Router()
@@ -32,7 +32,9 @@ router.get('/dashboard', protect, async (req, res) => {
     const facultyBatches = await Batch.find({ faculty: req.user.id }).lean()
     const batchLearnerIds = facultyBatches.flatMap(b => b.learners || [])
     const completedEvaluations = await OSCEEvaluation.find({ learnerId: { $in: batchLearnerIds } }).distinct('learnerId')
-    const pendingReviews = Math.max(0, batchLearnerIds.length - completedEvaluations.length)
+    const completedSet = new Set(completedEvaluations.map(id => id.toString()))
+    const pendingLearnerIds = batchLearnerIds.filter(id => !completedSet.has(id.toString()))
+    const pendingReviews = pendingLearnerIds.length
 
     // Recent results (latest 5 results with names populated)
     const recentResultsRaw = await Result.find().sort({ createdAt: -1 }).limit(5).lean()
@@ -74,6 +76,7 @@ router.get('/dashboard', protect, async (req, res) => {
       averageScore,
       passRate,
       pendingReviews,
+      pendingLearnerIds,
       recentResults,
       upcomingSimulations,
       coursePerformance,
@@ -245,6 +248,24 @@ router.post('/osce/evaluate', protect, async (req, res) => {
       { learnerId, courseId },
       { $set: { oscePassed: status === 'pass', status: status === 'pass' ? 'completed' : 'in_progress' } }
     )
+
+    // Create a Notification for the learner
+    try {
+      const course = await Course.findOne({ id: courseId }).lean()
+      const courseName = course ? course.name : 'Clinical Course'
+
+      await Notification.create({
+        id: 'n_osce_' + Date.now(),
+        learnerId,
+        type: 'osce_evaluation',
+        message: `Your OSCE Evaluation for ${courseName} is completed. Status: ${status.toUpperCase()}. Click here to review.`,
+        link: `/learner/osce/s1/${learnerId}`,
+        read: false,
+        createdAt: new Date().toISOString()
+      })
+    } catch (notifError) {
+      console.error('Failed to create learner notification:', notifError)
+    }
 
     res.status(201).json({ success: true, evaluation })
   } catch (error) {
@@ -453,6 +474,46 @@ router.get('/learner/:id', protect, async (req, res) => {
   } catch (error) {
     console.error('Fetch learner detail error:', error)
     res.status(500).json({ message: 'Server error loading learner details' })
+  }
+})
+
+// POST /api/faculty/feedback/send - Save AI feedback and notify learner
+router.post('/feedback/send', protect, async (req, res) => {
+  try {
+    const { learnerId, courseId, feedback } = req.body
+    const facultyId = req.user.id
+
+    if (!learnerId || !courseId || !feedback) {
+      return res.status(400).json({ message: 'learnerId, courseId, and feedback are required' })
+    }
+
+    // Save to DB
+    const aiFeedback = await AIFeedback.create({
+      learnerId,
+      facultyId,
+      courseId,
+      feedback,
+      createdAt: new Date().toISOString()
+    })
+
+    // Create a notification for the learner
+    const course = await Course.findOne({ id: courseId }).lean()
+    const courseName = course ? course.name : 'Clinical Course'
+
+    await Notification.create({
+      id: 'n_ai_feedback_' + Date.now(),
+      learnerId,
+      type: 'test_result',
+      message: `AI-Generated Performance Analysis feedback is available for ${courseName}. Click here to review.`,
+      link: `/learner/course/${courseId}`,
+      read: false,
+      createdAt: new Date().toISOString()
+    })
+
+    res.status(201).json({ success: true, aiFeedback })
+  } catch (error) {
+    console.error('Send AI feedback error:', error)
+    res.status(500).json({ message: 'Server error saving AI feedback' })
   }
 })
 

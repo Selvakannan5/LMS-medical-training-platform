@@ -10,6 +10,7 @@ import moduleRoutes from './routes/modules.js'
 import adminRoutes from './routes/admin.js'
 import facultyRoutes from './routes/faculty.js'
 import aiRoutes from './routes/ai.js'
+import osceRoutes from './routes/osce.js'
 
 const app = express()
 
@@ -39,6 +40,7 @@ app.use('/api/modules', moduleRoutes)
 app.use('/api/admin', adminRoutes)
 app.use('/api/faculty', facultyRoutes)
 app.use('/api/ai', aiRoutes)
+app.use('/api/osce', osceRoutes)
 
 const port = process.env.PORT || 8000
 
