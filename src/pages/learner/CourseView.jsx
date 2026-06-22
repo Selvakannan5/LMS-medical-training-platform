@@ -7,19 +7,7 @@ import { LoadingSpinner } from '@/components/shared/LoadingSpinner'
 import { useToast } from '@/context/ToastContext'
 import { queryClient } from '@/lib/queryClient'
 
-// A mock vector/illustration for clinical imagery placeholder
-function MedicalChartIllustration() {
-  return (
-    <div className="bg-slate-50 border border-dashed border-slate-300 rounded-xl p-6 flex flex-col items-center justify-center text-slate-400 aspect-[16/6] my-4 overflow-hidden relative">
-      <div className="absolute inset-0 bg-gradient-to-br from-blue-500/5 to-transparent pointer-events-none" />
-      <svg className="w-12 h-12 text-blue-500 mb-2 opacity-80 animate-pulse" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
-      </svg>
-      <p className="text-sm font-semibold text-slate-700">Clinical Reference Diagram</p>
-      <p className="text-xs text-slate-400 mt-1">Illustrating emergency airway/ventilation vectors</p>
-    </div>
-  )
-}
+
 
 function ModuleQuizSection({ moduleId, onQuizPassed }) {
   const toast = useToast()
@@ -46,7 +34,7 @@ function ModuleQuizSection({ moduleId, onQuizPassed }) {
         toast.success(`Passed! You scored ${data.score}%.`)
         onQuizPassed()
       } else {
-        toast.error(`Not passed. You scored ${data.score}%. Required is 80%.`)
+        toast.error(`Not passed. You scored ${data.score}%. Required is 100%.`)
       }
     },
     onError: () => toast.error('Failed to submit quiz answers')
@@ -100,7 +88,7 @@ function ModuleQuizSection({ moduleId, onQuizPassed }) {
         <div className={`rounded-2xl p-6 text-center border ${passed ? 'bg-green-50/50 border-green-200 text-green-800' : 'bg-rose-50/50 border-rose-200 text-rose-800'}`}>
           <span className="text-5xl block mb-2">{passed ? '🎉' : '✍️'}</span>
           <h4 className="text-2xl font-bold mb-1">{passed ? 'Quiz Passed!' : 'Quiz Attempt Failed'}</h4>
-          <p className="text-sm opacity-90 mb-4">You scored {score}% ({correct}/{total} correct). Required pass score is 80% (4/5).</p>
+          <p className="text-sm opacity-90 mb-4">You scored {score}% ({correct}/{total} correct). Required pass score is 100% (5/5).</p>
           
           {passed ? (
             <span className="px-4 py-2 bg-green-600 text-white font-bold text-sm rounded-lg inline-block">
@@ -175,7 +163,7 @@ function ModuleQuizSection({ moduleId, onQuizPassed }) {
     <form onSubmit={handleSubmit} className="space-y-6">
       <div className="bg-slate-50 border border-slate-200 rounded-xl p-4 flex justify-between items-center text-sm">
         <span className="font-semibold text-slate-700">Mandatory Assessment</span>
-        <span className="text-slate-500">5 Questions · 80% passing score</span>
+        <span className="text-slate-500">5 Questions · 100% passing score</span>
       </div>
 
       <div className="space-y-4">
@@ -246,7 +234,6 @@ const formatFeedback = (text) => {
 export default function CourseView() {
   const { id } = useParams()
   const toast = useToast()
-  const [activeTab, setActiveTab] = useState('study') // 'study' | 'quiz'
   const [currentModuleId, setCurrentModuleId] = useState(null) // selected sidebar item id ('pretest', 'posttest', or moduleId)
 
   const { data: course, isLoading, refetch } = useQuery({
@@ -261,6 +248,11 @@ export default function CourseView() {
       setCurrentModuleId(nextActive ? nextActive.id : course.modules[0].id)
     }
   }, [course])
+
+  // Scroll to top of window when active module changes
+  useEffect(() => {
+    window.scrollTo({ top: 0, behavior: 'smooth' })
+  }, [currentModuleId])
 
   if (isLoading) {
     return (
@@ -291,7 +283,6 @@ export default function CourseView() {
 
   const handleQuizPassed = () => {
     refetch()
-    setActiveTab('study')
   }
 
   return (
@@ -329,6 +320,28 @@ export default function CourseView() {
             </div>
 
             <div className="divide-y divide-slate-100">
+              {/* Pre-Test Item */}
+              <button
+                onClick={() => {
+                  setCurrentModuleId('pretest')
+                }}
+                className={`w-full flex items-center gap-3 px-4 py-3.5 text-left transition-colors text-xs font-semibold cursor-pointer hover:bg-slate-50
+                  ${currentModuleId === 'pretest' ? 'bg-blue-50 text-blue-800' : 'text-slate-700'}
+                `}
+              >
+                <div className={`w-5 h-5 rounded-full flex-shrink-0 flex items-center justify-center text-[10px]
+                  ${course.preTestPassed
+                    ? 'bg-green-500 text-white'
+                    : 'bg-amber-500 text-white'
+                  }
+                `}>
+                  {course.preTestPassed ? '✓' : '📝'}
+                </div>
+                <div className="min-w-0 flex-1">
+                  <p className="truncate font-semibold">Course Pre-Test</p>
+                  <p className="text-[10px] text-slate-400 font-medium">Baseline Assessment</p>
+                </div>
+              </button>
 
               {/* Modules Items */}
               {modules.map((mod, idx) => {
@@ -339,7 +352,6 @@ export default function CourseView() {
                     disabled={mod.locked}
                     onClick={() => {
                       setCurrentModuleId(mod.id)
-                      setActiveTab('study')
                     }}
                     className={`w-full flex items-center gap-3 px-4 py-3.5 text-left transition-colors text-xs font-semibold
                       ${mod.locked ? 'opacity-40 cursor-not-allowed' : 'cursor-pointer hover:bg-slate-50'}
@@ -347,12 +359,12 @@ export default function CourseView() {
                     `}
                   >
                     <div className={`w-5 h-5 rounded-full flex-shrink-0 flex items-center justify-center text-[10px]
-                      ${mod.completed
-                        ? 'bg-green-500 text-white'
-                        : mod.locked
-                          ? 'bg-slate-200 text-slate-400'
-                          : 'bg-blue-600 text-white'
-                      }
+                       ${mod.completed
+                         ? 'bg-green-500 text-white'
+                         : mod.locked
+                           ? 'bg-slate-200 text-slate-400'
+                           : 'bg-blue-600 text-white'
+                       }
                     `}>
                       {mod.completed ? '✓' : mod.locked ? '🔒' : idx + 1}
                     </div>
@@ -386,7 +398,7 @@ export default function CourseView() {
                   {course.postTestPassed ? '✓' : '🏆'}
                 </div>
                 <div className="min-w-0 flex-1">
-                  <p className="truncate">Final Post-Test</p>
+                  <p className="truncate font-semibold">Final Post-Test</p>
                   <p className="text-[10px] text-slate-400 font-medium">Certificate Eligibility</p>
                 </div>
               </button>
@@ -415,6 +427,31 @@ export default function CourseView() {
 
         {/* Right Content Panel */}
         <div className="lg:col-span-3">
+
+          {/* PANEL 1: Pre-Test Block */}
+          {currentModuleId === 'pretest' && (
+            <div className="bg-white border border-slate-100 rounded-2xl p-8 shadow-sm text-center max-w-xl mx-auto space-y-4">
+              <span className="text-6xl block">📝</span>
+              <h2 className="text-xl font-bold text-slate-800">Course Pre-Test</h2>
+              <p className="text-slate-500 text-sm leading-relaxed">
+                Take the baseline Course Pre-Test to evaluate your initial knowledge. This test is available to complete, but does not block you from starting the learning modules immediately.
+              </p>
+              {course.preTestPassed ? (
+                <div className="p-4 bg-green-50 border border-green-200 rounded-xl text-green-800 text-sm font-semibold inline-block">
+                  ✓ Pre-Test completed successfully!
+                </div>
+              ) : (
+                <div className="pt-2">
+                  <Link
+                    to={`/learner/assessment/${course.preTestId}`}
+                    className="px-6 py-3 bg-amber-600 hover:bg-amber-700 text-white font-bold rounded-xl shadow-md transition-colors inline-block"
+                  >
+                    Start Course Pre-Test
+                  </Link>
+                </div>
+              )}
+            </div>
+          )}
 
           {/* PANEL 4: AI Feedback Block */}
           {currentModuleId === 'aifeedback' && course.aiFeedback && (
@@ -472,170 +509,170 @@ export default function CourseView() {
           )}
 
           {/* PANEL 3: Active Module Learning Experience */}
-          {activeModule && (
-            <div className="space-y-4">
-              {/* Tab Navigation */}
-              <div className="bg-white rounded-2xl border border-slate-100 shadow-sm p-1.5 flex gap-2">
-                <button
-                  onClick={() => setActiveTab('study')}
-                  className={`flex-1 py-2.5 rounded-xl font-bold text-sm transition-all
-                    ${activeTab === 'study' 
-                      ? 'bg-blue-600 text-white shadow-sm' 
-                      : 'hover:bg-slate-50 text-slate-600'
-                    }`}
-                >
-                  📖 Study Material
-                </button>
-                <button
-                  onClick={() => setActiveTab('quiz')}
-                  className={`flex-1 py-2.5 rounded-xl font-bold text-sm transition-all
-                    ${activeTab === 'quiz' 
-                      ? 'bg-blue-600 text-white shadow-sm' 
-                      : 'hover:bg-slate-50 text-slate-600'
-                    }`}
-                >
-                  ✍️ Practice Quiz
-                </button>
+          {activeModule && currentModuleId !== 'pretest' && currentModuleId !== 'posttest' && (
+            <div className="bg-white rounded-3xl border border-slate-100 shadow-sm overflow-hidden p-6 md:p-8 animate-fade-in">
+              {/* Sticky Progress Indicator Header */}
+              <div className="sticky top-0 z-20 bg-white/95 backdrop-blur border-b border-slate-100 py-3.5 px-6 -mx-6 md:-mx-8 -mt-6 md:-mt-8 mb-8 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 shadow-sm">
+                <div>
+                  <span className="text-[10px] font-bold text-blue-600 uppercase tracking-widest">{course.name}</span>
+                  <h2 className="text-base font-extrabold text-slate-800 leading-tight mt-0.5">{activeModule.title}</h2>
+                </div>
+                <div className="flex items-center gap-3 self-end sm:self-auto text-right">
+                  <span className="text-xs font-bold text-slate-500 whitespace-nowrap">{activeModule.duration}</span>
+                  <div className="h-4 w-px bg-slate-200" />
+                  <div className="flex items-center gap-2">
+                    <span className="text-xs font-bold text-blue-600">{course.progress || 0}% Complete</span>
+                    <div className="w-16 h-1.5 bg-slate-100 rounded-full overflow-hidden">
+                      <div className="h-full bg-blue-600 rounded-full" style={{ width: `${course.progress || 0}%` }} />
+                    </div>
+                  </div>
+                </div>
               </div>
 
-              {/* Tab 1 Content: Detailed study items */}
-              {activeTab === 'study' && (
-                <div className="bg-white rounded-2xl border border-slate-100 shadow-sm p-6 space-y-6">
-                  {/* Module header */}
-                  <div className="border-b border-slate-100 pb-4">
-                    <h2 className="text-xl font-bold text-slate-800">{activeModule.title}</h2>
-                    <p className="text-xs text-slate-500 mt-1 capitalize">Study Session · {activeModule.duration}</p>
-                  </div>
+              {/* Handbook-Style Main Content */}
+              <div className="max-w-3xl mx-auto space-y-8">
+                
+                {/* 1. Learning Objectives */}
+                <div className="bg-emerald-50/50 border-l-4 border-emerald-500 rounded-r-xl p-5 mb-6 shadow-sm">
+                  <h4 className="font-extrabold text-emerald-950 text-xs uppercase tracking-wider mb-2 flex items-center gap-1.5">
+                    🎯 Learning Objectives
+                  </h4>
+                  <p className="text-xs text-emerald-900 leading-relaxed font-medium">
+                    {activeModule.learningObjectives || 'Analyze critical steps for assessment and rapid intervention.'}
+                  </p>
+                </div>
 
-                  {/* Learning Objectives */}
-                  <div className="bg-green-50/40 border border-green-100 rounded-xl p-5">
-                    <h4 className="font-bold text-green-900 text-sm flex items-center gap-1.5 mb-2">
-                      <span>🎯</span> Learning Objectives
+                {/* 2. Core Study Content (Textbook/Handbook Style) */}
+                <div className="space-y-3">
+                  <h4 className="font-extrabold text-slate-800 text-xs uppercase tracking-wider border-b border-slate-100 pb-2">
+                    📖 Core Clinical Content
+                  </h4>
+                  <p className="font-serif text-slate-800 text-base md:text-lg leading-relaxed antialiased whitespace-pre-line tracking-wide bg-slate-50/30 p-5 rounded-2xl border border-slate-100/50">
+                    {activeModule.studyContent}
+                  </p>
+                </div>
+
+                {/* 3. Clinical Scenario Card */}
+                {activeModule.clinicalScenario && (
+                  <div className="bg-indigo-50/40 border border-indigo-100 rounded-2xl p-6 shadow-sm">
+                    <h4 className="font-extrabold text-indigo-950 text-xs uppercase tracking-wider mb-3 flex items-center gap-2">
+                      🩺 Clinical Case Scenario
                     </h4>
-                    <p className="text-xs text-green-800 leading-relaxed font-medium">
-                      {activeModule.learningObjectives || 'Analyze critical steps for assessment and rapid intervention.'}
+                    <p className="text-xs text-indigo-900 leading-relaxed italic whitespace-pre-line bg-white/70 p-4 rounded-xl border border-indigo-100/50">
+                      {activeModule.clinicalScenario}
                     </p>
                   </div>
+                )}
 
-                  {/* Detailed Study Content */}
-                  <div className="space-y-3">
-                    <h4 className="font-bold text-slate-800 text-sm">Detailed Study Content</h4>
-                    <p className="text-slate-700 text-xs leading-relaxed whitespace-pre-line bg-slate-50/50 p-5 rounded-xl border border-slate-100">
-                      {activeModule.studyContent}
+                {/* 4. Algorithm Flow Section */}
+                {activeModule.algorithm && (
+                  <div className="bg-slate-900 rounded-2xl p-6 shadow-md border border-slate-800">
+                    <h4 className="font-bold text-white text-xs uppercase tracking-wider mb-4 flex items-center gap-2">
+                      ⚡ Emergency Resuscitation Algorithm
+                    </h4>
+                    <div className="font-mono text-[11px] text-emerald-400 bg-slate-950 p-4 rounded-xl border border-slate-800 leading-relaxed whitespace-pre-line overflow-x-auto">
+                      {activeModule.algorithm}
+                    </div>
+                  </div>
+                )}
+
+                {/* 5. Important Clinical Notes */}
+                {activeModule.importantNotes && (
+                  <div className="bg-yellow-50/60 border border-yellow-200 rounded-2xl p-6 shadow-sm">
+                    <h4 className="font-extrabold text-yellow-950 text-xs uppercase tracking-wider mb-2.5 flex items-center gap-2">
+                      📌 Important Clinical Notes
+                    </h4>
+                    <p className="text-xs text-yellow-900 leading-relaxed whitespace-pre-line">
+                      {activeModule.importantNotes}
                     </p>
                   </div>
+                )}
 
-                  {/* Clinical Scenarios */}
-                  {activeModule.clinicalScenarios && (
-                    <div className="bg-blue-50/40 border border-blue-100 rounded-xl p-5">
-                      <h4 className="font-bold text-blue-900 text-sm flex items-center gap-1.5 mb-2">
-                        <span>🩺</span> Clinical Scenario
+                {/* 6. Common Mistakes & Critical Safety Tips */}
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  {activeModule.commonMistakes && (
+                    <div className="bg-rose-50/60 border border-rose-200 rounded-2xl p-6 shadow-sm">
+                      <h4 className="font-extrabold text-rose-950 text-xs uppercase tracking-wider mb-2.5 flex items-center gap-2">
+                        ❌ Common Mistakes to Avoid
                       </h4>
-                      <p className="text-xs text-blue-800 leading-relaxed font-medium">
-                        {activeModule.clinicalScenarios}
+                      <p className="text-xs text-rose-900 leading-relaxed whitespace-pre-line bg-white/50 p-4 rounded-xl border border-rose-100/50">
+                        {activeModule.commonMistakes}
                       </p>
                     </div>
                   )}
 
-                  {/* Emergency Algorithms */}
-                  {activeModule.emergencyAlgorithms && (
-                    <div className="space-y-3">
-                      <h4 className="font-bold text-slate-800 text-sm flex items-center gap-1.5">
-                        <span>⚡</span> Emergency Algorithm
+                  {activeModule.safetyTips && (
+                    <div className="bg-amber-50/60 border border-amber-200 rounded-2xl p-6 shadow-sm">
+                      <h4 className="font-extrabold text-amber-950 text-xs uppercase tracking-wider mb-2.5 flex items-center gap-2">
+                        ⚠️ Critical Safety Tips
                       </h4>
-                      <div className="p-4 bg-slate-50 border border-slate-200 rounded-xl">
-                        <p className="text-xs font-bold text-blue-700 mb-2">Execution Pipeline:</p>
-                        <p className="text-xs font-medium text-slate-700 whitespace-pre-line leading-relaxed">
-                          {activeModule.emergencyAlgorithms}
-                        </p>
-                      </div>
+                      <p className="text-xs text-amber-900 leading-relaxed whitespace-pre-line bg-white/50 p-4 rounded-xl border border-amber-100/50">
+                        {activeModule.safetyTips}
+                      </p>
                     </div>
                   )}
-
-                  {/* Graphic Diagram */}
-                  <MedicalChartIllustration />
-
-                  {/* Key Takeaways & Clinical Pearls */}
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    {activeModule.keyTakeaways && (
-                      <div className="bg-slate-50 border border-slate-100 rounded-xl p-5">
-                        <h4 className="font-bold text-slate-800 text-sm mb-3">Key Takeaways</h4>
-                        <ul className="list-disc pl-4 space-y-1.5 text-xs text-slate-600 font-medium">
-                          {Array.isArray(activeModule.keyTakeaways) ? (
-                            activeModule.keyTakeaways.map((k, i) => <li key={i}>{k}</li>)
-                          ) : (
-                            <li>{activeModule.keyTakeaways}</li>
-                          )}
-                        </ul>
-                      </div>
-                    )}
-
-                    {activeModule.clinicalPearls && (
-                      <div className="bg-purple-50/40 border border-purple-100 rounded-xl p-5">
-                        <h4 className="font-bold text-purple-900 text-sm mb-2 flex items-center gap-1.5">
-                          <span>💡</span> Clinical Pearl
-                        </h4>
-                        <p className="text-xs text-purple-800 leading-relaxed font-medium">
-                          {activeModule.clinicalPearls}
-                        </p>
-                      </div>
-                    )}
-                  </div>
-
-                  {/* Important Notes */}
-                  {activeModule.importantNotes && (
-                    <div className="bg-amber-50/40 border border-amber-100 rounded-xl p-5 flex gap-3">
-                      <span className="text-xl">⚠️</span>
-                      <div>
-                        <h4 className="font-bold text-amber-900 text-sm mb-1">Important Warning</h4>
-                        <p className="text-xs text-amber-800 leading-relaxed font-medium">
-                          {activeModule.importantNotes}
-                        </p>
-                      </div>
-                    </div>
-                  )}
-
-                  {/* References */}
-                  {activeModule.references && (
-                    <div className="border-t border-slate-100 pt-4 text-[10px] text-slate-400">
-                      <p className="font-semibold mb-1">References & Guidelines:</p>
-                      <p className="italic font-medium">{activeModule.references}</p>
-                    </div>
-                  )}
-
-                  {/* Completion Status / Trigger */}
-                  <div className="flex justify-between items-center border-t border-slate-100 pt-5">
-                    <p className="text-xs text-slate-400 font-medium">Completed reading? Take the practice quiz next.</p>
-                    {activeModule.completed ? (
-                      <span className="flex items-center gap-1 text-xs font-bold text-green-600 bg-green-50 px-3 py-1.5 rounded-lg border border-green-200">
-                        ✓ Completed
-                      </span>
-                    ) : (
-                      <button
-                        onClick={() => setActiveTab('quiz')}
-                        className="px-5 py-2.5 bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold rounded-xl transition-all shadow-sm flex items-center gap-1.5"
-                      >
-                        Start Practice Quiz →
-                      </button>
-                    )}
-                  </div>
                 </div>
-              )}
 
-              {/* Tab 2 Content: Inline Quiz Section */}
-              {activeTab === 'quiz' && (
-                <div className="bg-white rounded-2xl border border-slate-100 shadow-sm p-6">
+                {/* 7. Key Points / Quick Revision */}
+                {activeModule.keyPoints && (
+                  <div className="bg-emerald-50/40 border border-emerald-100 rounded-2xl p-6 shadow-sm">
+                    <h4 className="font-extrabold text-emerald-950 text-xs uppercase tracking-wider mb-3">
+                      💡 Quick Revision & Key Points
+                    </h4>
+                    <ul className="space-y-2 text-xs text-emerald-900 font-medium">
+                      {Array.isArray(activeModule.keyPoints) ? (
+                        activeModule.keyPoints.map((k, i) => (
+                          <li key={i} className="flex gap-2 items-start">
+                            <span className="text-emerald-600 mt-0.5">✓</span>
+                            <span>{k}</span>
+                          </li>
+                        ))
+                      ) : (
+                        <li className="flex gap-2 items-start">
+                          <span className="text-emerald-600 mt-0.5">✓</span>
+                          <span className="whitespace-pre-line">{activeModule.keyPoints}</span>
+                        </li>
+                      )}
+                    </ul>
+                  </div>
+                )}
+
+                {/* 8. Module Summary */}
+                {activeModule.summary && (
+                  <div className="bg-slate-50 border border-slate-200 rounded-2xl p-6 shadow-sm">
+                    <h4 className="font-extrabold text-slate-800 text-xs uppercase tracking-wider mb-2 flex items-center gap-2">
+                      📋 Module Summary
+                    </h4>
+                    <p className="text-xs text-slate-600 leading-relaxed whitespace-pre-line">
+                      {activeModule.summary}
+                    </p>
+                  </div>
+                )}
+
+                {/* 9. References */}
+                {activeModule.references && (
+                  <div className="border-t border-slate-100 pt-4 text-[10px] text-slate-400">
+                    <p className="font-semibold mb-1">References & Guidelines:</p>
+                    <p className="italic font-medium">{activeModule.references}</p>
+                  </div>
+                )}
+
+                {/* 10. Integrated Quiz Assessment Section (Directly Below Content) */}
+                <div className="border-t border-slate-200 pt-8 mt-10">
+                  <h3 className="text-lg font-black text-slate-800 mb-6 flex items-center gap-2 uppercase tracking-tight">
+                    ✍️ Module Assessment Quiz
+                  </h3>
+                  
                   {activeModule.completed ? (
                     <div className="space-y-4">
-                      <div className="bg-green-50 border border-green-200 text-green-800 rounded-xl p-5 text-center font-bold text-sm">
-                        ✓ Quiz Passed! You have unlocked the next module.
+                      <div className="bg-emerald-50 border border-emerald-200 text-emerald-800 rounded-2xl p-5 text-center font-bold text-sm">
+                        ✓ Quiz Passed! You have scored 100% and unlocked the next module.
                       </div>
                       <button
                         onClick={() => {
                           const currentIndex = modules.findIndex(m => m.id === activeModule.id)
                           if (currentIndex !== -1 && currentIndex < modules.length - 1) {
                             setCurrentModuleId(modules[currentIndex + 1].id)
-                            setActiveTab('study')
                           } else {
                             setCurrentModuleId('posttest')
                           }
@@ -649,7 +686,8 @@ export default function CourseView() {
                     <ModuleQuizSection moduleId={activeModule.id} onQuizPassed={handleQuizPassed} />
                   )}
                 </div>
-              )}
+
+              </div>
             </div>
           )}
         </div>

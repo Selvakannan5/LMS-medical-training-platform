@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useCallback } from 'react'
-import { useParams, useNavigate } from 'react-router-dom'
+import { useParams, useNavigate, Link } from 'react-router-dom'
 import { useQuery, useMutation } from '@tanstack/react-query'
 import api from '@/lib/axios'
 import { LoadingSpinner } from '@/components/shared/LoadingSpinner'
@@ -18,18 +18,25 @@ function ResultScreen({ result, assessment, onRetry }) {
         <div className={`inline-flex items-center gap-2 px-6 py-3 rounded-full font-bold text-lg ${passed ? 'bg-green-600 text-white' : 'bg-red-500 text-white'}`}>
           {passed ? '✓ PASSED' : '✕ FAILED'}
         </div>
-        {!passed && (
-          <div className="mt-4">
-            <p className="text-sm text-slate-600 mb-3">Review the recommended modules before retrying</p>
+        
+        <div className="mt-6 flex justify-center gap-3">
+          {!passed && (
             <button
               onClick={onRetry}
               id="retry-assessment-btn"
-              className="px-6 py-2.5 bg-red-500 text-white font-semibold rounded-xl hover:bg-red-600 transition-colors"
+              className="px-6 py-2.5 bg-red-500 text-white font-semibold rounded-xl hover:bg-red-600 transition-colors text-sm"
             >
               Retry Assessment
             </button>
-          </div>
-        )}
+          )}
+          <Link
+            to={`/learner/course/${result.courseId || assessment.courseId}`}
+            className="px-6 py-2.5 bg-blue-600 text-white font-semibold rounded-xl hover:bg-blue-700 transition-colors inline-block text-sm"
+            id="return-to-course-btn"
+          >
+            ← Return to Course
+          </Link>
+        </div>
       </div>
 
       <div className="bg-white rounded-2xl shadow-sm border border-slate-100 overflow-hidden">

@@ -105,7 +105,7 @@ router.post('/enroll', protect, async (req, res) => {
       learnerId,
       courseId,
       progress: 0,
-      preTestPassed: true, // Bypass or set preTestPassed to true initially
+      preTestPassed: false,
       postTestPassed: false,
       completedModules: [],
       unlockedModules: course.modules?.length > 0 ? [course.modules[0].id] : [],

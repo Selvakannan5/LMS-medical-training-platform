@@ -231,6 +231,21 @@ try {
 
   await User.insertMany(users)
   await Program.insertMany(programs)
+  // Dynamic Important Notes Seeding
+  courses.forEach(c => {
+    if (c.modules) {
+      c.modules.forEach(m => {
+        if (!m.importantNotes) {
+          if (m.keyPoints && m.keyPoints.length > 0) {
+            m.importantNotes = `Resuscitation outcomes are heavily dependent on strict protocol execution. Note: ${m.keyPoints[0]} Minimize interruptions during interventions.`
+          } else {
+            m.importantNotes = `Clinical protocol adherence is critical. Ensure all resuscitation team members have clearly defined roles and communicate using closed-loop techniques.`
+          }
+        }
+      })
+    }
+  })
+
   await Course.insertMany(courses)
   await Assessment.insertMany(assessments)
   await Enrollment.insertMany(enrollments)
