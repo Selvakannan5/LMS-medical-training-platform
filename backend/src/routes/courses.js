@@ -38,7 +38,7 @@ router.get('/:id/modules', protect, async (req, res) => {
         learnerId,
         courseId,
         progress: 0,
-        preTestPassed: true,
+        preTestPassed: false,
         postTestPassed: false,
         completedModules: [],
         unlockedModules: course.modules?.length > 0 ? [course.modules[0].id] : [],
@@ -46,14 +46,9 @@ router.get('/:id/modules', protect, async (req, res) => {
       })
     }
 
-    // Identify post-test assessment in database
+    // Identify pre-test and post-test assessments in database
+    const preTest = await Assessment.findOne({ courseId, type: 'pre-test' }).lean()
     const postTest = await Assessment.findOne({ courseId, type: 'post-test' }).lean()
-
-    // Ensure the first module is unlocked
-    if (courseProgress.unlockedModules.length === 0 && course.modules?.length > 0) {
-      courseProgress.unlockedModules.push(course.modules[0].id)
-      await courseProgress.save()
-    }
 
     // Map modules and determine locks/completions dynamically per user
     const modulesMapped = (course.modules || []).map((m, index) => {
@@ -76,8 +71,8 @@ router.get('/:id/modules', protect, async (req, res) => {
       progress: courseProgress.progress,
       preTestPassed: courseProgress.preTestPassed,
       postTestPassed: courseProgress.postTestPassed,
-      preTestId: null,
-      postTestId: postTest?.id || `${courseId}-posttest`,
+      preTestId: preTest?.id || course.preTestId || `${courseId}-pretest`,
+      postTestId: postTest?.id || course.postTestId || `${courseId}-posttest`,
       modules: modulesMapped,
       aiFeedback: aiFeedbackRecord ? aiFeedbackRecord.feedback : null
     })

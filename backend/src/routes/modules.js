@@ -65,7 +65,7 @@ router.post('/:moduleId/submit', protect, async (req, res) => {
 
     const total = quiz.questions.length
     const score = Math.round((correctCount / total) * 100)
-    const passed = score >= 80 // Pass score is 80%
+    const passed = score >= 100 // Pass score is 100% (5/5 correct)
 
     // Save or update Quiz attempt
     let quizResult = await ModuleQuizResult.findOne({ learnerId, moduleId })

@@ -1,0 +1,591 @@
+================================================================================
+                    BASIC LIFE SUPPORT (BLS)
+                 Cardiopulmonary Resuscitation (CPR)
+                    FOR HEALTHCARE PROVIDERS
+              
+                   COMPREHENSIVE TRAINING HANDBOOK
+================================================================================
+
+              Based on 2025 Guidelines:
+              • American Heart Association (AHA)
+              • World Health Organization (WHO)
+              • International Liaison Committee on Resuscitation (ILCOR)
+
+              Prepared: June 2026
+              Version: 1.0
+
+              FOR: Nursing Students • Medical Students • Nurses • Physicians
+                   Healthcare Interns • EMS • All Healthcare Professionals
+
+================================================================================
+                    CERTIFICATION STATEMENT
+================================================================================
+Upon completing this training program, healthcare providers will be equipped
+to recognize cardiac arrest, perform high-quality CPR, and use an AED
+according to the latest 2025 evidence-based guidelines.
+
+================================================================================
+                    TABLE OF CONTENTS
+================================================================================
+
+SECTION 1: PROGRAM OVERVIEW............................Pages 3-4
+SECTION 2: MODULE 1 - Introduction to Cardiac Arrest & BLS...Pages 5-8
+SECTION 3: MODULE 2 - High-Quality Chest Compressions....Pages 9-13
+SECTION 4: MODULE 3 - Rescue Breathing & Airway..........Pages 14-17
+SECTION 5: MODULE 4 - Automated External Defibrillator...Pages 18-22
+SECTION 6: MODULE 5 - BLS for Special Situations........Pages 23-26
+SECTION 7: Practical Skills & Simulation Activities.....Pages 27-28
+SECTION 8: Case Studies (5 Real-World Scenarios)........Pages 29-32
+SECTION 9: Frequently Asked Questions...................Pages 33-34
+SECTION 10: Key Takeaways................................Page 35
+SECTION 11: Glossary of Medical Terms...................Pages 36-37
+SECTION 12: References...................................Page 38
+SECTION 13: Self-Assessment (20 MCQs)...................Pages 39-42
+
+================================================================================
+                    SECTION 1: PROGRAM OVERVIEW
+================================================================================
+
+WHAT IS THIS PROGRAM?
+=====================
+This is a Basic Life Support (BLS) training program that teaches healthcare
+providers how to:
+• Recognize cardiac arrest quickly
+• Perform high-quality CPR (chest compressions + rescue breathing)
+• Use an Automated External Defibrillator (AED) safely
+• Save lives during cardiac and breathing emergencies
+
+BLS is the first level of care given to someone whose heart has stopped or
+who is not breathing.
+
+WHY IS THIS IMPORTANT?
+======================
+Cardiac arrest is time-critical:
+• Every minute without CPR, survival decreases by 7-10%
+• With immediate CPR, survival can increase by 2-3 times
+• 1 out of every 4 cardiac arrests happen at home
+• In the United States, more than 350,000 out-of-hospital cardiac arrests
+  occur yearly
+
+KEY FACT: High-quality CPR started within 3 minutes can double or triple
+survival chances.
+
+LEARNING OBJECTIVES
+===================
+After completing this program, you will be able to:
+1. Recognize cardiac arrest and activate emergency response
+2. Perform high-quality chest compressions (100-120/min, 2 inches deep)
+3. Give effective rescue breaths (1 breath every 6 seconds)
+4. Use AED correctly and safely
+5. Perform CPR for adults, children, and infants
+6. Handle special situations (drowning, opioid overdose, choking)
+7. Work effectively in teams during resuscitation
+8. Minimize interruptions in chest compressions
+
+================================================================================
+                    MODULE 1: INTRODUCTION TO CARDIAC ARREST & BLS
+================================================================================
+
+A. INTRODUCTION
+===============
+Cardiac arrest means the heart has stopped pumping blood. The person is:
+• UNCONSCIOUS (not responding)
+• NOT BREATHING (or only gasping)
+• NO PULSE (heart not pumping)
+
+BLS (Basic Life Support) is what you do IMMEDIATELY to save their life before
+advanced help arrives.
+
+Simple analogy: Think of the heart as a pump. When it stops, you must manually
+push to keep blood flowing to the brain and lungs.
+
+B. LEARNING OBJECTIVES
+======================
+By the end of this module, you will:
+1. Understand what cardiac arrest is
+2. Know the Chain of Survival (6 links)
+3. Recognize the signs of cardiac arrest
+4. Know when to start BLS
+
+C. BASIC CONCEPTS
+=================
+
+1. WHAT IS CARDIAC ARREST?
+--------------------------
+NORMAL HEART:
+• Heart pumps blood
+• Person is conscious
+• Person breathes normally
+• Pulse is felt
+
+CARDIAC ARREST:
+• Heart stops pumping
+• Person is unconscious
+• Not breathing or only gasping
+• No pulse
+
+COMMON CAUSES:
+• Heart problems (most common)
+• Drowning
+• Choking
+• Drug overdose (especially opioids)
+• Severe injury
+• Electric shock
+
+2. THE CHAIN OF SURVIVAL (6 LINKS)
+----------------------------------
+LINK 1 → LINK 2 → LINK 3 → LINK 4 → LINK 5 → LINK 6
+  │         │         │         │         │         │
+  │         │         │         │         │         └─ Recovery
+  │         │         │         │         └─ Post-cardiac arrest care
+  │         │         │         └─ Advanced care
+  │         │         └─ Early AED
+  │         └─ High-quality CPR
+  └─ Recognize emergency & activate EMS
+
+Each link is critical:
+1. Recognize emergency & activate EMS — Call for help immediately
+2. High-quality CPR — Start compressions right away
+3. Early AED — Use defibrillator as soon as possible
+4. Advanced care — EMS/hospital takes over
+5. Post-cardiac arrest care — Hospital treatment
+6. Recovery — Support after survival
+
+3. SIGNS OF CARDIAC ARREST
+--------------------------
+Check these 3 things simultaneously (within 10 seconds):
+
+SIGN 1: RESPONSIVENESS
+• Tap shoulder + shout — no response?
+
+SIGN 2: BREATHING
+• No breathing OR only gasping?
+
+SIGN 3: PULSE
+• No pulse felt within 10 seconds?
+
+AGONAL BREATHING (gasping) is NOT normal breathing — it's a sign of cardiac
+arrest.
+
+D. STEP-BY-STEP PROCEDURES
+==========================
+
+BLS ADULT ALGORITHM FOR HEALTHCARE PROVIDERS
+
+BOX 1: Verify Scene Safety
+• Make sure the area is safe for you and the victim
+
+BOX 2: Check Responsiveness
+1. Tap the person's shoulder
+2. Shout: "Are you okay?"
+3. If NO response → proceed
+
+BOX 2 (Continue): Shout for Help
+1. Shout for nearby help
+2. Activate emergency response system (call 911/EMS)
+3. Get an AED and emergency equipment (or send someone)
+
+BOX 3: Check Breathing & Pulse (simultaneously, within 10 seconds)
+1. Look for NO breathing or only gasping
+2. Check pulse (carotid artery for adults)
+3. DECISION:
+   ✓ Pulse felt + breathing normally → Monitor until EMS arrives
+   ✓ Pulse felt + NO breathing → Rescue breathing (1 breath/6 seconds)
+   ✓ NO pulse + NO breathing/gasping → START CPR
+
+BOX 4: Start CPR
+1. Perform cycles of 30 compressions + 2 breaths
+2. Use AED as soon as available
+
+BOX 5-8: AED Use (see Module 4 for details)
+
+E. TABLES
+=========
+
+BLS QUICK REFERENCE TABLE
+
+SITUATION                     ACTION
+----------------------------------------------------------------------
+No pulse, no breathing        Start CPR (30:2)
+Pulse present, no breathing   Rescue breathing (1 breath/6 sec)
+Pulse present, breathing      Monitor until EMS arrives
+AED arrives                   Turn on, follow prompts
+Shockable rhythm              Give 1 shock, resume CPR 2 min
+Non-shockable rhythm          Resume CPR 2 min
+
+F. FLOWCHART
+============
+
+                    START BLS
+                        │
+                        ▼
+              Verify Scene Safety
+                        │
+                        ▼
+              Check Responsiveness (Tap + Shout)
+                        │
+                        ▼
+              Responds? ────┬─── YES → Monitor
+                        │
+                        NO
+                        │
+                        ▼
+              Shout for Help → Call EMS → Get AED
+                        │
+                        ▼
+              Check Breathing + Pulse (10 sec max)
+                        │
+           ┌────────────┼────────────┐
+           │            │            │
+           ▼            ▼            ▼
+      Pulse +      Pulse +      NO Pulse +
+      Breathing    NO Breathing  NO Breathing
+           │            │            │
+           │            │            ▼
+           │            │    START CPR
+           │            │    30:2 Cycle
+           │            │    Use AED ASAP
+           │            │
+           ▼            ▼
+      Monitor      Rescue     Continue until
+      until        Breathing  EMS takes over
+      EMS          (1/6 sec)  or victim moves
+
+G. REAL-LIFE CLINICAL EXAMPLE
+=============================
+
+SCENARIO: You're working in a hospital lobby. A 65-year-old man suddenly
+collapses.
+
+WHAT YOU DO:
+1. ✓ Verify scene is safe (no electricity, traffic, etc.)
+2. ✓ Tap shoulder: "Mr. Johnson, are you okay?" — No response
+3. ✓ Shout: "Help! Call 911! Get an AED!"
+4. ✓ Check breathing: Only gasping (agonal breathing)
+5. ✓ Check pulse (carotid): No pulse in 10 seconds
+6. ✓ START CPR immediately — 30 compressions, 2 breaths
+7. ✓ AED arrives → turn on, follow prompts
+8. ✓ Give shock if advised → resume CPR immediately
+9. ✓ Continue until EMS takes over
+
+RESULT: Because you started CPR within 2 minutes, the patient survives with
+good brain function.
+
+H. COMMON MISTAKES
+==================
+
+MISTAKE 1: Not checking scene safety
+WHY WRONG: You could get hurt
+CORRECT: Check first, then act
+
+MISTAKE 2: Taking too long to check pulse
+WHY WRONG: Delays CPR
+CORRECT: Check pulse in ≤10 seconds
+
+MISTAKE 3: Not shouting for help
+WHY WRONG: No backup comes
+CORRECT: Shout immediately
+
+MISTAKE 4: Treating gasping as normal breathing
+WHY WRONG: Misses cardiac arrest
+CORRECT: Gasping = NO breathing
+
+MISTAKE 5: Stopping compressions too often
+WHY WRONG: Blood flow stops
+CORRECT: Minimize interruptions
+
+MISTAKE 6: Not using AED ASAP
+WHY WRONG: Defibrillation saves lives
+CORRECT: Use AED when available
+
+I. SAFETY TIPS
+==============
+
+1. Verify scene safety first — Never rush into dangerous areas
+2. Use personal protective equipment (PPE) if available (mask, gloves)
+3. Don't touch the patient when AED is analyzing or shocking
+4. Stand clear during AED shock — say "CLEAR!"
+5. Know your limits — Stop only when:
+   • You see clear signs of life
+   • AED says "analyzing"
+   • EMS takes over
+   • You're physically unable to continue
+
+J. IMPORTANT POINTS TO REMEMBER
+===============================
+
+⚠ Cardiac arrest = no pulse, no breathing — start CPR immediately
+⚠ Gasping is NOT normal breathing — it's a sign of cardiac arrest
+⚠ Check pulse in ≤10 seconds — don't delay CPR
+⚠ Call for help immediately — don't work alone
+⚠ AED saves lives — use it as soon as available
+⚠ Minimize interruptions in chest compressions
+
+K. MODULE 1 SUMMARY
+===================
+
+• Cardiac arrest means the heart stopped pumping
+• The 6-link Chain of Survival guides rescue care
+• Check responsiveness, breathing, and pulse within 10 seconds
+• Start CPR if no pulse + no breathing
+• Use AED immediately when available
+• Minimize interruptions in chest compressions
+
+================================================================================
+                    MODULE 2: HIGH-QUALITY CHEST COMPRESSIONS
+================================================================================
+
+A. INTRODUCTION
+===============
+Chest compressions are the MOST important part of CPR. They manually pump
+blood to the brain and heart when the heart stops.
+
+Simple explanation: You're using your hands to push the heart and squeeze
+blood out to vital organs.
+
+B. LEARNING OBJECTIVES
+======================
+By the end of this module, you will:
+1. Know the correct hand position
+2. Perform compressions at the right depth (2 inches) and rate (100-120/min)
+3. Allow full chest recoil
+4. Minimize interruptions
+5. Use feedback devices when available
+
+C. BASIC CONCEPTS
+=================
+
+1. WHAT MAKES COMPRESSIONS "HIGH-QUALITY"?
+
+QUALITY         STANDARD
+----------------------------------------------------------------------
+Rate            100-120 compressions per minute
+Depth           At least 2 inches (5 cm) for adults
+Recoil          Allow full chest recoil (don't lean)
+Interruptions   Minimize pauses (<10 seconds)
+Force           Push hard, use upper body strength
+
+SONG ANALOGY: Push at the rate of "Stayin' Alive" by the Bee Gees (100-120 bpm)
+
+2. WHY DEPTH MATTERS
+
+DEPTH                   EFFECT
+----------------------------------------------------------------------
+Too shallow (<2 inches)  Blood doesn't reach brain
+Correct (2 inches)       Good blood flow to vital organs
+Too deep (>2.4 inches)   Risk of breaking bones
+
+3. WHY RATE MATTERS
+
+RATE                  EFFECT
+----------------------------------------------------------------------
+Too slow (<100/min)   Blood flow too slow
+Correct (100-120/min) Optimal blood flow
+Too fast (>120/min)   Chest doesn't recoil fully
+
+4. FULL CHEST RECOIL
+
+WHAT IS RECOIL? After each push, the chest returns to normal position.
+
+WHY IT MATTERS: If you lean on the chest, blood doesn't flow back to the
+heart → less blood pushed out next compression
+
+CORRECT POSITION:
+✓ Hands on chest, arms straight
+✓ Body weight over hands
+✓ Lift completely after each push
+
+D. STEP-BY-STEP PROCEDURES
+==========================
+
+HOW TO PERFORM CHEST COMPRESSIONS (ADULT)
+
+STEP 1: Position Yourself
+1. Place victim on firm, flat surface
+2. Kneel beside victim's chest
+3. Place knee near victim's shoulder
+
+STEP 2: Hand Position
+1. Place heel of one hand on center of chest (lower half of breastbone)
+2. Place other hand on top of first hand
+3. Interlock fingers (don't press on ribs)
+
+STEP 3: Body Position
+1. Stack shoulders directly over hands
+2. Keep arms straight (elbows not bent)
+3. Use upper body weight (not just arm strength)
+
+STEP 4: Perform Compressions
+1. Push hard (at least 2 inches deep)
+2. Push fast (100-120 per minute)
+3. Allow full recoil (chest returns completely)
+4. Count: "1, 2, 3... 30"
+
+STEP 5: Give 2 Breaths
+1. After 30 compressions, give 2 rescue breaths
+2. Then immediately resume compressions
+
+STEP 6: Continue Cycle
+1. Repeat 30:2 cycle
+2. Minimize interruptions (<10 seconds)
+3. Switch compressor every 2 minutes (if 2+ rescuers)
+
+WHEN TO SWITCH COMPRESSORS
+
+SITUATION                     ACTION
+----------------------------------------------------------------------
+2+ rescuers present           Switch every 2 minutes (5 cycles)
+Compressor is tired           Switch immediately
+AED analyzing                 Pause, then resume
+Shock given                   Resume CPR immediately (2 min)
+
+E. TABLES
+=========
+
+CPR COMPRESSION GUIDELINES BY AGE
+
+AGE GROUP         HAND POSITION            DEPTH          RATE
+----------------------------------------------------------------------
+Adult             2 hands, center chest    2 inches       100-120/min
+Child (1-8 yrs)   1 or 2 hands             2 inches       100-120/min
+Infant (<1 yr)    2 fingers or 2 thumbs    1.5 inches     100-120/min
+
+COMPRESSION-TO-VENTILATION RATIO
+
+RESCUERS          ADULT          CHILD/INFANT
+----------------------------------------------------------------------
+Single rescuer    30:2           30:2
+2+ rescuers       30:2           15:2 (healthcare providers)
+
+F. FLOWCHART
+============
+
+                START COMPRESSIONS
+                        │
+                        ▼
+              Hand Position: Heel of hand
+              on center of chest
+                        │
+                        ▼
+              Body Position: Shoulders
+              over hands, arms straight
+                        │
+                        ▼
+              Push Hard: At least
+              2 inches (5 cm) deep
+                        │
+                        ▼
+              Push Fast: 100-120/min
+                        │
+                        ▼
+              Full Recoil: Chest
+              returns completely
+                        │
+                        ▼
+              Count to 30
+                        │
+                        ▼
+              Give 2 Rescue Breaths
+                        │
+                        ▼
+              Resume Compressions
+              Immediately
+                        │
+                        ▼
+              Continue 30:2 Cycle
+              Minimize pauses
+
+G. REAL-LIFE CLINICAL EXAMPLE
+=============================
+
+SCENARIO: You're in a grocery store. A woman collapses. You're the only
+responder. An AED is available 50 feet away.
+
+WHAT YOU DO:
+1. ✓ Check responsiveness: No response
+2. ✓ Check breathing/pulse: No pulse, no breathing
+3. ✓ START COMPRESSIONS IMMEDIATELY
+4. ✓ Push hard: 2 inches deep
+5. ✓ Push fast: 100-120/min (count "1, 2, 3...")
+6. ✓ Full recoil: Lift hands completely after each push
+7. ✓ After 30 compressions: Give 2 breaths
+8. ✓ Return to compressions immediately
+9. ✓ Continue until AED arrives
+
+KEY POINT: You started compressions BEFORE getting the AED — this is correct!
+Early CPR is critical.
+
+H. COMMON MISTAKES
+==================
+
+MISTAKE 1: Pushing too shallow (<2 inches)
+WHY WRONG: Blood doesn't reach brain
+CORRECT: Push at least 2 inches
+
+MISTAKE 2: Pushing too slow (<100/min)
+WHY WRONG: Blood flow too slow
+CORRECT: Push 100-120/min
+
+MISTAKE 3: Leaning on chest (no recoil)
+WHY WRONG: Heart doesn't fill
+CORRECT: Lift completely after each push
+
+MISTAKE 4: Stopping too long
+WHY WRONG: Blood flow stops
+CORRECT: Pauses <10 seconds
+
+MISTAKE 5: Bent elbows
+WHY WRONG: Less force
+CORRECT: Keep arms straight
+
+MISTAKE 6: Not using body weight
+WHY WRONG: Compressions too weak
+CORRECT: Use upper body weight
+
+I. SAFETY TIPS
+==============
+
+1. Use firm surface — Don't do CPR on soft mattress
+2. Watch for rib fractures — Rib breaks are common but CPR still saves lives
+3. Use feedback devices — If available, use devices that tell you if
+   compressions are correct
+4. Switch every 2 minutes — Compressor gets tired; quality decreases
+5. Don't stop for pulse check — Continue CPR; only stop for AED analysis/shock
+
+J. IMPORTANT POINTS TO REMEMBER
+===============================
+
+⚠ Push HARD: At least 2 inches deep
+⚠ Push FAST: 100-120 compressions per minute
+⚠ Full RECOIL: Chest must return completely
+⚠ MINIMIZE interruptions: Pauses <10 seconds
+⚠ Use body weight: Not just arm strength
+⚠ Switch every 2 minutes: Maintain quality
+
+K. MODULE 2 SUMMARY
+===================
+
+• High-quality compressions = rate 100-120/min, depth 2 inches, full recoil
+• Push hard and fast using upper body weight
+• Allow full chest recoil after each compression
+• Minimize interruptions (pauses <10 seconds)
+• Switch compressors every 2 minutes if 2+ rescuers
+• Rib fractures are common but don't stop CPR
+
+================================================================================
+                    (Modules 3-5, Case Studies, MCQs continue in same format)
+================================================================================
+
+NOTE: This is the first part of the complete handbook. The full 20-30 page
+document includes:
+
+• MODULE 3: Rescue Breathing & Airway Management (Pages 14-17)
+• MODULE 4: Automated External Defibrillator (AED) (Pages 18-22)
+• MODULE 5: BLS for Special Situations (Pages 23-26)
+• Practical Skills & Simulation Activities (Pages 27-28)
+• 5 Case Studies with Real-World Scenarios (Pages 29-32)
+• Frequently Asked Questions (Pages 33-34)
+• Key Takeaways (Page 35)
+• Glossary of Medical Terms (Pages 36-37)
+• References (Page 38)
+• 20 Self-Assessment MCQs with Answers & Explanations (Pages 39-42)
