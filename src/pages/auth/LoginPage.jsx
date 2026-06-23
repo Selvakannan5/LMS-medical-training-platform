@@ -6,6 +6,7 @@ import { z } from 'zod'
 import { useAuth } from '@/context/AuthContext'
 import { useToast } from '@/context/ToastContext'
 import { LoadingSpinner } from '@/components/shared/LoadingSpinner'
+import { GraduationCap, Stethoscope, UserCog } from 'lucide-react'
 
 const schema = z.object({
   email: z.string().email('Enter a valid email'),
@@ -19,9 +20,15 @@ export default function LoginPage() {
   const location = useLocation()
   const [loading, setLoading] = useState(false)
 
-  const { register, handleSubmit, formState: { errors } } = useForm({
+  const { register, handleSubmit, setValue, formState: { errors } } = useForm({
     resolver: zodResolver(schema),
   })
+
+  const handleDemoLogin = async (email, password) => {
+    setValue('email', email, { shouldValidate: true })
+    setValue('password', password, { shouldValidate: true })
+    onSubmit({ email, password })
+  }
 
   const from = location.state?.from?.pathname
 
@@ -129,6 +136,56 @@ export default function LoginPage() {
                 {loading ? <><LoadingSpinner size="sm" color="text-white" /> Signing in…</> : 'Sign In'}
               </button>
             </form>
+
+            <div className="relative my-6">
+              <div className="absolute inset-0 flex items-center">
+                <div className="w-full border-t border-slate-100"></div>
+              </div>
+              <div className="relative flex justify-center text-xs uppercase">
+                <span className="bg-white px-3 text-slate-400 font-semibold tracking-wider">Or Quick Demo Login</span>
+              </div>
+            </div>
+
+            <div className="grid grid-cols-3 gap-2">
+              <button
+                type="button"
+                onClick={() => handleDemoLogin('learner@demo.com', 'MedTrain@123')}
+                className="group flex flex-col items-center justify-center p-3 rounded-xl border border-slate-100 hover:border-blue-200 bg-slate-50/50 hover:bg-blue-50/50 hover:shadow-sm transition-all duration-200 cursor-pointer"
+                id="demo-login-learner"
+              >
+                <div className="w-10 h-10 rounded-lg bg-blue-50 group-hover:bg-blue-100 text-blue-600 flex items-center justify-center mb-1.5 transition-colors">
+                  <GraduationCap className="w-5 h-5" />
+                </div>
+                <span className="text-xs font-semibold text-slate-700 group-hover:text-blue-700">Learner</span>
+                <span className="text-[10px] text-slate-400">Ronaldo</span>
+              </button>
+
+              <button
+                type="button"
+                onClick={() => handleDemoLogin('faculty@demo.com', 'MedTrain@123')}
+                className="group flex flex-col items-center justify-center p-3 rounded-xl border border-slate-100 hover:border-purple-200 bg-slate-50/50 hover:bg-purple-50/50 hover:shadow-sm transition-all duration-200 cursor-pointer"
+                id="demo-login-faculty"
+              >
+                <div className="w-10 h-10 rounded-lg bg-purple-50 group-hover:bg-purple-100 text-purple-600 flex items-center justify-center mb-1.5 transition-colors">
+                  <Stethoscope className="w-5 h-5" />
+                </div>
+                <span className="text-xs font-semibold text-slate-700 group-hover:text-purple-700">Faculty</span>
+                <span className="text-[10px] text-slate-400">Dr. Suresh</span>
+              </button>
+
+              <button
+                type="button"
+                onClick={() => handleDemoLogin('admin@demo.com', 'MedTrain@123')}
+                className="group flex flex-col items-center justify-center p-3 rounded-xl border border-slate-100 hover:border-slate-300 bg-slate-50/50 hover:bg-slate-100 hover:shadow-sm transition-all duration-200 cursor-pointer"
+                id="demo-login-admin"
+              >
+                <div className="w-10 h-10 rounded-lg bg-slate-100 group-hover:bg-slate-200 text-slate-700 flex items-center justify-center mb-1.5 transition-colors">
+                  <UserCog className="w-5 h-5" />
+                </div>
+                <span className="text-xs font-semibold text-slate-700 group-hover:text-slate-800">Admin</span>
+                <span className="text-[10px] text-slate-400">Control Panel</span>
+              </button>
+            </div>
 
             <div className="mt-6 pt-5 border-t border-slate-100 text-center text-sm">
               <span className="text-slate-500">Don't have an account? </span>

@@ -1,8 +1,19 @@
 import React from 'react'
 
-export function ProgressBar({ value = 0, max = 100, label, showPercent = true, color = 'bg-blue-600', className = '' }) {
+export function ProgressBar({ value = 0, max = 100, label, showPercent = true, color = 'blue', className = '' }) {
   const pct = Math.min(100, Math.max(0, (value / max) * 100))
   const colorClass = pct >= 80 ? 'bg-green-500' : pct >= 50 ? 'bg-blue-500' : 'bg-amber-500'
+
+  const colorMap = {
+    blue: 'bg-blue-600',
+    green: 'bg-green-500',
+    emerald: 'bg-emerald-500',
+    purple: 'bg-purple-600',
+    amber: 'bg-amber-500',
+    red: 'bg-red-500',
+  }
+
+  const barColor = color === 'auto' ? colorClass : (colorMap[color] || color)
 
   return (
     <div className={`w-full ${className}`}>
@@ -14,7 +25,7 @@ export function ProgressBar({ value = 0, max = 100, label, showPercent = true, c
       )}
       <div className="w-full h-2 bg-slate-100 rounded-full overflow-hidden">
         <div
-          className={`h-full rounded-full transition-all duration-700 ease-out ${color === 'auto' ? colorClass : color}`}
+          className={`h-full rounded-full transition-all duration-700 ease-out ${barColor}`}
           style={{ width: `${pct}%` }}
         />
       </div>

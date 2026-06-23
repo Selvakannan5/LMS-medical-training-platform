@@ -8,6 +8,7 @@ const navItems = [
     label: 'Main',
     items: [
       { to: '/learner', end: true, icon: '🏠', label: 'Dashboard', id: 'learner-dashboard' },
+      { to: '/learner/osce-results', icon: '📊', label: 'OSCE Results', id: 'learner-osce' },
       { to: '/learner/certificates', icon: '🏆', label: 'Certificates', id: 'learner-certs' },
       { to: '/learner/profile', icon: '👤', label: 'Profile', id: 'learner-profile' },
     ],

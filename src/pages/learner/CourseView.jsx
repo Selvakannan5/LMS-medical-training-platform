@@ -6,6 +6,7 @@ import { ProgressBar } from '@/components/shared/ProgressBar'
 import { LoadingSpinner } from '@/components/shared/LoadingSpinner'
 import { useToast } from '@/context/ToastContext'
 import { queryClient } from '@/lib/queryClient'
+import { BookOpen, Video, Workflow, Play, Award } from 'lucide-react'
 
 function ModuleQuizSection({ moduleId, onQuizPassed }) {
   const toast = useToast()
@@ -296,6 +297,7 @@ export default function CourseView() {
   const toast = useToast()
   const [currentModuleId, setCurrentModuleId] = useState(null)
   const [isSidebarOpen, setIsSidebarOpen] = useState(false)
+  const [activeSubTab, setActiveSubTab] = useState('study') // 'study', 'video', 'flowchart'
 
   const { data: course, isLoading, refetch } = useQuery({
     queryKey: ['course', id],
@@ -310,6 +312,7 @@ export default function CourseView() {
   }, [course])
 
   useEffect(() => {
+    setActiveSubTab('study')
     window.scrollTo({ top: 0, behavior: 'smooth' })
   }, [currentModuleId])
 
@@ -647,159 +650,355 @@ export default function CourseView() {
                   </div>
                 </div>
 
-                <div className="max-w-3xl mx-auto space-y-8">
-                  <div className="bg-emerald-50/50 border-l-4 border-emerald-500 rounded-r-xl p-5 mb-6 shadow-sm">
-                    <h4 className="font-extrabold text-emerald-950 text-xs uppercase tracking-wider mb-2 flex items-center gap-1.5">
-                      🎯 Learning Objectives
-                    </h4>
-                    <p className="text-xs text-emerald-900 leading-relaxed font-medium whitespace-pre-line">
-                      {activeModule.learningObjectives ||
-                        'Analyze critical steps for assessment and rapid intervention.'}
-                    </p>
-                  </div>
-
-                  <div className="space-y-3">
-                    <h4 className="font-extrabold text-slate-800 text-xs uppercase tracking-wider border-b border-slate-100 pb-2">
-                      📖 Core Clinical Content
-                    </h4>
-                    <p className="font-serif text-slate-800 text-base md:text-lg leading-relaxed antialiased whitespace-pre-line tracking-wide bg-slate-50/30 p-5 rounded-2xl border border-slate-100/50">
-                      {activeModule.studyContent}
-                    </p>
-                  </div>
-
-                  {activeModule.clinicalScenario && (
-                    <div className="bg-indigo-50/40 border border-indigo-100 rounded-2xl p-6 shadow-sm">
-                      <h4 className="font-extrabold text-indigo-950 text-xs uppercase tracking-wider mb-3 flex items-center gap-2">
-                        🩺 Clinical Case Scenario
-                      </h4>
-                      <p className="text-xs text-indigo-900 leading-relaxed italic whitespace-pre-line bg-white/70 p-4 rounded-xl border border-indigo-100/50">
-                        {activeModule.clinicalScenario}
-                      </p>
-                    </div>
-                  )}
-
-                  {activeModule.algorithm && (
-                    <div className="bg-slate-900 rounded-2xl p-6 shadow-md border border-slate-800">
-                      <h4 className="font-bold text-white text-xs uppercase tracking-wider mb-4 flex items-center gap-2">
-                        ⚡ Emergency Algorithm
-                      </h4>
-                      <div className="font-mono text-[11px] text-emerald-400 bg-slate-950 p-4 rounded-xl border border-slate-800 leading-relaxed whitespace-pre-line overflow-x-auto">
-                        {activeModule.algorithm}
-                      </div>
-                    </div>
-                  )}
-
-                  {activeModule.importantNotes && (
-                    <div className="bg-yellow-50/60 border border-yellow-200 rounded-2xl p-6 shadow-sm">
-                      <h4 className="font-extrabold text-yellow-950 text-xs uppercase tracking-wider mb-2.5 flex items-center gap-2">
-                        📌 Important Clinical Notes
-                      </h4>
-                      <p className="text-xs text-yellow-900 leading-relaxed whitespace-pre-line">
-                        {activeModule.importantNotes}
-                      </p>
-                    </div>
-                  )}
-
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    {activeModule.commonMistakes && (
-                      <div className="bg-rose-50/60 border border-rose-200 rounded-2xl p-6 shadow-sm">
-                        <h4 className="font-extrabold text-rose-950 text-xs uppercase tracking-wider mb-2.5 flex items-center gap-2">
-                          ❌ Common Mistakes
-                        </h4>
-                        <p className="text-xs text-rose-900 leading-relaxed whitespace-pre-line bg-white/50 p-4 rounded-xl border border-rose-100/50">
-                          {activeModule.commonMistakes}
-                        </p>
-                      </div>
-                    )}
-
-                    {activeModule.safetyTips && (
-                      <div className="bg-amber-50/60 border border-amber-200 rounded-2xl p-6 shadow-sm">
-                        <h4 className="font-extrabold text-amber-950 text-xs uppercase tracking-wider mb-2.5 flex items-center gap-2">
-                          ⚠️ Safety Tips
-                        </h4>
-                        <p className="text-xs text-amber-900 leading-relaxed whitespace-pre-line bg-white/50 p-4 rounded-xl border border-amber-100/50">
-                          {activeModule.safetyTips}
-                        </p>
-                      </div>
-                    )}
-                  </div>
-
-                  {activeModule.keyPoints && (
-                    <div className="bg-emerald-50/40 border border-emerald-100 rounded-2xl p-6 shadow-sm">
-                      <h4 className="font-extrabold text-emerald-950 text-xs uppercase tracking-wider mb-3">
-                        💡 Quick Revision
-                      </h4>
-
-                      <ul className="space-y-2 text-xs text-emerald-900 font-medium">
-                        {Array.isArray(activeModule.keyPoints) ? (
-                          activeModule.keyPoints.map((k, i) => (
-                            <li key={i} className="flex gap-2 items-start">
-                              <span className="text-emerald-600 mt-0.5">✓</span>
-                              <span>{k}</span>
-                            </li>
-                          ))
-                        ) : (
-                          <li className="flex gap-2 items-start">
-                            <span className="text-emerald-600 mt-0.5">✓</span>
-                            <span className="whitespace-pre-line">{activeModule.keyPoints}</span>
-                          </li>
+                {/* Module Sub-Tabs */}
+                <div className="flex border-b border-slate-100 mb-8 -mx-6 md:-mx-8 px-6 md:px-8 bg-slate-50/20">
+                  {[
+                    { id: 'study', label: 'Study Guide', icon: BookOpen, color: 'text-blue-600', border: 'border-blue-600' },
+                    { id: 'video', label: 'Video Lecture', icon: Video, color: 'text-purple-600', border: 'border-purple-600' },
+                    { id: 'flowchart', label: 'Flowchart Tab', icon: Workflow, color: 'text-emerald-600', border: 'border-emerald-600' },
+                    { id: 'quiz', label: 'Module Quiz', icon: Award, color: 'text-amber-600', border: 'border-amber-600' }
+                  ].map((tab) => {
+                    const IconComponent = tab.icon
+                    const isSelected = activeSubTab === tab.id
+                    return (
+                      <button
+                        key={tab.id}
+                        type="button"
+                        onClick={() => setActiveSubTab(tab.id)}
+                        className={`flex items-center gap-2 py-3 px-4 font-bold text-xs transition-all relative border-b-2 cursor-pointer
+                          ${isSelected 
+                            ? `${tab.border} ${tab.color} bg-white` 
+                            : 'border-transparent text-slate-500 hover:text-slate-800 hover:bg-slate-100/50'
+                          }`}
+                      >
+                        <IconComponent className={`w-4 h-4 ${isSelected ? tab.color : 'text-slate-400'}`} />
+                        <span>{tab.label}</span>
+                        {tab.id === 'video' && (
+                          <span className="text-[9px] px-1.5 py-0.5 rounded-full font-bold bg-purple-50 text-purple-600">
+                            Beta
+                          </span>
                         )}
-                      </ul>
+                        {tab.id === 'flowchart' && (
+                          <span className="text-[9px] px-1.5 py-0.5 rounded-full font-bold bg-emerald-50 text-emerald-700">
+                            Beta
+                          </span>
+                        )}
+                        {tab.id === 'quiz' && (
+                          <span className={`text-[9px] px-1.5 py-0.5 rounded-full font-bold
+                            ${activeModule.completed ? 'bg-green-550 text-green-600' : 'bg-amber-50 text-amber-605'}
+                          `}>
+                            {activeModule.completed ? 'Passed' : 'Required'}
+                          </span>
+                        )}
+                      </button>
+                    )
+                  })}
+                </div>
+
+                <div className="max-w-3xl mx-auto space-y-8">
+                  {activeSubTab === 'study' && (
+                    <>
+                      <div className="space-y-3">
+                        <h4 className="font-bold text-slate-800 text-sm uppercase tracking-wider flex items-center gap-1.5 border-b border-slate-100 pb-2">
+                          🎯 Learning Objectives
+                        </h4>
+                        <p className="text-sm text-slate-600 leading-relaxed whitespace-pre-line">
+                          {activeModule.learningObjectives ||
+                            'Analyze critical steps for assessment and rapid intervention.'}
+                        </p>
+                      </div>
+
+                      <div className="space-y-3">
+                        <h4 className="font-bold text-slate-800 text-sm uppercase tracking-wider flex items-center gap-1.5 border-b border-slate-100 pb-2">
+                          📖 Core Clinical Content
+                        </h4>
+                        <p className="text-sm text-slate-600 leading-relaxed whitespace-pre-line">
+                          {activeModule.studyContent}
+                        </p>
+                      </div>
+
+                      {activeModule.clinicalScenario && (
+                        <div className="space-y-3">
+                          <h4 className="font-bold text-slate-800 text-sm uppercase tracking-wider flex items-center gap-1.5 border-b border-slate-100 pb-2">
+                            🩺 Clinical Case Scenario
+                          </h4>
+                          <p className="text-sm text-slate-600 leading-relaxed whitespace-pre-line">
+                            {activeModule.clinicalScenario}
+                          </p>
+                        </div>
+                      )}
+
+                      {activeModule.algorithm && (
+                        <div className="space-y-3">
+                          <h4 className="font-bold text-slate-800 text-sm uppercase tracking-wider flex items-center gap-1.5 border-b border-slate-100 pb-2">
+                            ⚡ Emergency Algorithm
+                          </h4>
+                          <div className="font-mono text-sm text-slate-600 bg-slate-50/50 p-4 rounded-xl border border-slate-200/60 leading-relaxed whitespace-pre-line overflow-x-auto">
+                            {activeModule.algorithm}
+                          </div>
+                        </div>
+                      )}
+
+                      {activeModule.importantNotes && (
+                        <div className="space-y-3">
+                          <h4 className="font-bold text-slate-800 text-sm uppercase tracking-wider flex items-center gap-1.5 border-b border-slate-100 pb-2">
+                            📌 Important Clinical Notes
+                          </h4>
+                          <p className="text-sm text-slate-600 leading-relaxed whitespace-pre-line">
+                            {activeModule.importantNotes}
+                          </p>
+                        </div>
+                      )}
+
+                      {activeModule.commonMistakes && (
+                        <div className="space-y-3">
+                          <h4 className="font-bold text-slate-800 text-sm uppercase tracking-wider flex items-center gap-1.5 border-b border-slate-100 pb-2">
+                            ❌ Common Mistakes
+                          </h4>
+                          <p className="text-sm text-slate-600 leading-relaxed whitespace-pre-line">
+                            {activeModule.commonMistakes}
+                          </p>
+                        </div>
+                      )}
+
+                      {activeModule.safetyTips && (
+                        <div className="space-y-3">
+                          <h4 className="font-bold text-slate-800 text-sm uppercase tracking-wider flex items-center gap-1.5 border-b border-slate-100 pb-2">
+                            ⚠️ Safety Tips
+                          </h4>
+                          <p className="text-sm text-slate-600 leading-relaxed whitespace-pre-line">
+                            {activeModule.safetyTips}
+                          </p>
+                        </div>
+                      )}
+
+                      {activeModule.keyPoints && (
+                        <div className="space-y-3">
+                          <h4 className="font-bold text-slate-800 text-sm uppercase tracking-wider flex items-center gap-1.5 border-b border-slate-100 pb-2">
+                            💡 Quick Revision
+                          </h4>
+
+                          <ul className="space-y-2 text-sm text-slate-600 leading-relaxed">
+                            {Array.isArray(activeModule.keyPoints) ? (
+                              activeModule.keyPoints.map((k, i) => (
+                                <li key={i} className="flex gap-2 items-start">
+                                  <span className="text-blue-600 mt-0.5">✓</span>
+                                  <span>{k}</span>
+                                </li>
+                              ))
+                            ) : (
+                              <li className="flex gap-2 items-start">
+                                <span className="text-blue-600 mt-0.5">✓</span>
+                                <span className="whitespace-pre-line">{activeModule.keyPoints}</span>
+                              </li>
+                            )}
+                          </ul>
+                        </div>
+                      )}
+
+                      {activeModule.summary && (
+                        <div className="space-y-3">
+                          <h4 className="font-bold text-slate-800 text-sm uppercase tracking-wider flex items-center gap-1.5 border-b border-slate-100 pb-2">
+                            📋 Module Summary
+                          </h4>
+                          <p className="text-sm text-slate-600 leading-relaxed whitespace-pre-line">
+                            {activeModule.summary}
+                          </p>
+                        </div>
+                      )}
+
+                      {activeModule.references && (
+                        <div className="border-t border-slate-100 pt-4 text-xs text-slate-500">
+                          <p className="font-semibold mb-1">References & Guidelines:</p>
+                          <p className="italic font-medium">{activeModule.references}</p>
+                        </div>
+                      )}
+                    </>
+                  )}
+
+                  {activeSubTab === 'quiz' && (
+                    <div className="space-y-6 animate-fade-in max-w-3xl mx-auto">
+                      <div className="bg-white rounded-3xl border border-slate-100 p-6 md:p-8 shadow-sm">
+                        <h3 className="text-lg font-black text-slate-800 mb-6 flex items-center gap-2 uppercase tracking-tight">
+                          ✍️ Module Assessment Quiz
+                        </h3>
+
+                        {activeModule.completed ? (
+                          <div className="space-y-4">
+                            <div className="bg-emerald-50 border border-emerald-200 text-emerald-800 rounded-2xl p-5 text-center font-bold text-sm">
+                              ✓ Quiz Passed! Next module unlocked.
+                            </div>
+
+                            <button
+                              onClick={() => {
+                                const currentIndex = modules.findIndex((m) => m.id === activeModule.id)
+                                if (currentIndex !== -1 && currentIndex < modules.length - 1) {
+                                  setCurrentModuleId(modules[currentIndex + 1].id)
+                                } else {
+                                  setCurrentModuleId('posttest')
+                                }
+                              }}
+                              className="w-full py-3 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-xl text-center shadow-md transition-colors block text-xs"
+                            >
+                              {modules.findIndex((m) => m.id === activeModule.id) < modules.length - 1
+                                ? 'Go to Next Module'
+                                : 'Go to Final Post-Test'}
+                            </button>
+                          </div>
+                        ) : (
+                          <ModuleQuizSection
+                            moduleId={activeModule.id}
+                            onQuizPassed={handleQuizPassed}
+                          />
+                        )}
+                      </div>
                     </div>
                   )}
 
-                  {activeModule.summary && (
-                    <div className="bg-slate-50 border border-slate-200 rounded-2xl p-6 shadow-sm">
-                      <h4 className="font-extrabold text-slate-800 text-xs uppercase tracking-wider mb-2 flex items-center gap-2">
-                        📋 Module Summary
-                      </h4>
-                      <p className="text-xs text-slate-600 leading-relaxed whitespace-pre-line">
-                        {activeModule.summary}
-                      </p>
-                    </div>
-                  )}
-
-                  {activeModule.references && (
-                    <div className="border-t border-slate-100 pt-4 text-[10px] text-slate-400">
-                      <p className="font-semibold mb-1">References & Guidelines:</p>
-                      <p className="italic font-medium">{activeModule.references}</p>
-                    </div>
-                  )}
-
-                  <div className="border-t border-slate-200 pt-8 mt-10">
-                    <h3 className="text-lg font-black text-slate-800 mb-6 flex items-center gap-2 uppercase tracking-tight">
-                      ✍️ Module Assessment Quiz
-                    </h3>
-
-                    {activeModule.completed ? (
-                      <div className="space-y-4">
-                        <div className="bg-emerald-50 border border-emerald-200 text-emerald-800 rounded-2xl p-5 text-center font-bold text-sm">
-                          ✓ Quiz Passed! Next module unlocked.
+                  {activeSubTab === 'video' && (
+                    <div className="space-y-6 animate-fade-in max-w-3xl mx-auto">
+                      <div className="bg-slate-900 rounded-3xl overflow-hidden shadow-2xl border border-slate-800 relative group aspect-video flex flex-col justify-between p-6">
+                        {/* Video overlay/simulation */}
+                        <div className="absolute inset-0 bg-gradient-to-t from-slate-950 via-slate-950/20 to-slate-950/40 z-0" />
+                        
+                        {/* Top bar */}
+                        <div className="relative z-10 flex items-center justify-between">
+                          <span className="text-[10px] bg-red-600 text-white font-bold px-2 py-0.5 rounded uppercase tracking-wider">Demo Video</span>
+                          <span className="text-xs text-slate-400 font-mono">00:00 / 08:34</span>
                         </div>
 
-                        <button
-                          onClick={() => {
-                            const currentIndex = modules.findIndex((m) => m.id === activeModule.id)
-                            if (currentIndex !== -1 && currentIndex < modules.length - 1) {
-                              setCurrentModuleId(modules[currentIndex + 1].id)
-                            } else {
-                              setCurrentModuleId('posttest')
-                            }
-                          }}
-                          className="w-full py-3 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-xl text-center shadow-md transition-colors block text-xs"
-                        >
-                          {modules.findIndex((m) => m.id === activeModule.id) < modules.length - 1
-                            ? 'Go to Next Module'
-                            : 'Go to Final Post-Test'}
-                        </button>
+                        {/* Center play icon */}
+                        <div className="relative z-10 flex flex-col items-center justify-center my-auto">
+                          <button 
+                            type="button" 
+                            className="w-16 h-16 rounded-full bg-blue-600/90 text-white flex items-center justify-center shadow-lg shadow-blue-500/30 hover:scale-105 active:scale-95 transition-all duration-300 cursor-pointer animate-pulse"
+                          >
+                            <Play className="w-8 h-8 fill-white translate-x-0.5" />
+                          </button>
+                          <span className="text-sm font-semibold text-white mt-4">Module Video Demonstration</span>
+                          <span className="text-xs text-slate-400 mt-1">Click to simulate playing</span>
+                        </div>
+
+                        {/* Video Controls Bar */}
+                        <div className="relative z-10 w-full space-y-3">
+                          {/* Progress bar */}
+                          <div className="h-1 w-full bg-slate-800 rounded-full overflow-hidden">
+                            <div className="h-full bg-blue-600 w-1/3 rounded-full" />
+                          </div>
+                          <div className="flex items-center justify-between text-slate-400 text-xs">
+                            <div className="flex items-center gap-4">
+                              <span>⏸</span>
+                              <span>🔊</span>
+                            </div>
+                            <span>⚙️ HD</span>
+                          </div>
+                        </div>
                       </div>
-                    ) : (
-                      <ModuleQuizSection
-                        moduleId={activeModule.id}
-                        onQuizPassed={handleQuizPassed}
-                      />
-                    )}
-                  </div>
+
+                      <div className="bg-blue-50/50 border border-blue-100 rounded-2xl p-6 text-center space-y-3">
+                        <div className="w-12 h-12 rounded-full bg-blue-100 text-blue-600 flex items-center justify-center mx-auto">
+                          <Video className="w-6 h-6" />
+                        </div>
+                        <h4 className="text-sm font-bold text-slate-800">Coming Soon: Video Lectures</h4>
+                        <p className="text-xs text-slate-500 max-w-md mx-auto leading-relaxed">
+                          We are currently producing high-fidelity clinical simulation videos and procedural instructions for {activeModule.title}. These will be integrated in the next scheduled release.
+                        </p>
+                        <div className="inline-flex items-center gap-1.5 px-3 py-1 bg-blue-100/50 text-blue-700 text-[10px] font-bold rounded-full">
+                          <span>📅 Target Release: Q3 2026</span>
+                        </div>
+                      </div>
+                    </div>
+                  )}
+
+                  {activeSubTab === 'flowchart' && (
+                    <div className="space-y-6 animate-fade-in max-w-3xl mx-auto">
+                      <div className="bg-slate-50 border border-slate-200 rounded-3xl p-6 md:p-8 shadow-sm">
+                        <h3 className="text-sm font-bold text-slate-800 mb-6 flex items-center gap-2">
+                          <Workflow className="w-4 h-4 text-emerald-600" />
+                          {activeModule.title} — Clinical Protocol Flowchart
+                        </h3>
+
+                        {/* Interactive flow rendering */}
+                        <div className="flex flex-col items-center space-y-4">
+                          {/* Box 1 */}
+                          <div className="bg-white border-2 border-emerald-600 text-slate-800 rounded-xl p-4 shadow-sm max-w-xs w-full text-center hover:scale-102 transition-transform duration-200">
+                            <span className="text-[9px] font-bold uppercase tracking-wider text-emerald-600 block mb-0.5">Step 1: Primary Assessment</span>
+                            <span className="text-xs font-semibold">Assess responsiveness and check for breathing & pulse</span>
+                          </div>
+
+                          {/* Connector Arrow */}
+                          <div className="w-0.5 h-6 bg-slate-300 relative">
+                            <div className="absolute bottom-0 left-1/2 -translate-x-1/2 border-l-[4px] border-r-[4px] border-t-[6px] border-l-transparent border-r-transparent border-t-slate-300" />
+                          </div>
+
+                          {/* Branching row */}
+                          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 w-full max-w-2xl">
+                            {/* Left branch */}
+                            <div className="flex flex-col items-center space-y-4">
+                              <div className="bg-rose-50 border border-rose-200 text-rose-800 rounded-xl p-3.5 shadow-sm text-center w-full">
+                                <span className="text-[9px] font-bold uppercase tracking-wider block mb-0.5">Condition A</span>
+                                <span className="text-xs font-semibold">No pulse & no breathing</span>
+                              </div>
+
+                              <div className="w-0.5 h-6 bg-slate-300 relative">
+                                <div className="absolute bottom-0 left-1/2 -translate-x-1/2 border-l-[4px] border-r-[4px] border-t-[6px] border-l-transparent border-r-transparent border-t-slate-300" />
+                              </div>
+
+                              <div className="bg-white border-2 border-rose-500 rounded-xl p-4 shadow-sm text-center w-full hover:scale-102 transition-transform duration-200">
+                                <span className="text-[9px] font-bold uppercase tracking-wider text-rose-500 block mb-0.5">Intervention</span>
+                                <span className="text-xs font-semibold">Start high-quality CPR (30 compressions : 2 breaths) & attach AED immediately</span>
+                              </div>
+                            </div>
+
+                            {/* Right branch */}
+                            <div className="flex flex-col items-center space-y-4">
+                              <div className="bg-blue-50 border border-blue-200 text-blue-800 rounded-xl p-3.5 shadow-sm text-center w-full">
+                                <span className="text-[9px] font-bold uppercase tracking-wider block mb-0.5">Condition B</span>
+                                <span className="text-xs font-semibold">Pulse present but abnormal breathing</span>
+                              </div>
+
+                              <div className="w-0.5 h-6 bg-slate-300 relative">
+                                <div className="absolute bottom-0 left-1/2 -translate-x-1/2 border-l-[4px] border-r-[4px] border-t-[6px] border-l-transparent border-r-transparent border-t-slate-300" />
+                              </div>
+
+                              <div className="bg-white border-2 border-blue-500 rounded-xl p-4 shadow-sm text-center w-full hover:scale-102 transition-transform duration-200">
+                                <span className="text-[9px] font-bold uppercase tracking-wider text-blue-500 block mb-0.5">Intervention</span>
+                                <span className="text-xs font-semibold">Provide rescue breathing (1 breath every 5-6 seconds, check pulse every 2 mins)</span>
+                              </div>
+                            </div>
+                          </div>
+
+                          {/* Connectors to ending */}
+                          <div className="flex items-center justify-between w-full max-w-md pt-2">
+                            <div className="h-0.5 flex-1 bg-slate-300" />
+                            <div className="w-0.5 h-6 bg-slate-300 relative shrink-0">
+                              <div className="absolute bottom-0 left-1/2 -translate-x-1/2 border-l-[4px] border-r-[4px] border-t-[6px] border-l-transparent border-r-transparent border-t-slate-300" />
+                            </div>
+                            <div className="h-0.5 flex-1 bg-slate-300" />
+                          </div>
+
+                          {/* Final Box */}
+                          <div className="bg-slate-900 border border-slate-800 text-white rounded-xl p-4 shadow-md max-w-xs w-full text-center hover:scale-102 transition-transform duration-200">
+                            <span className="text-[9px] font-bold uppercase tracking-wider text-emerald-400 block mb-0.5">Re-evaluation</span>
+                            <span className="text-xs font-semibold">Continue cycle until EMS arrives or ROSC is achieved</span>
+                          </div>
+                        </div>
+                      </div>
+
+                      <div className="bg-emerald-50/50 border border-emerald-100 rounded-2xl p-6 text-center space-y-3">
+                        <div className="w-12 h-12 rounded-full bg-emerald-100 text-emerald-600 flex items-center justify-center mx-auto">
+                          <Workflow className="w-6 h-6" />
+                        </div>
+                        <h4 className="text-sm font-bold text-slate-800">Coming Soon: Flowchart Schema Builder</h4>
+                        <p className="text-xs text-slate-500 max-w-md mx-auto leading-relaxed">
+                          We are building an interactive clinical decision-tree tool that maps out step-by-step pathways according to the latest AHA/ERC guidelines.
+                        </p>
+                        <div className="inline-flex items-center gap-1.5 px-3 py-1 bg-emerald-100/50 text-emerald-700 text-[10px] font-bold rounded-full">
+                          <span>📅 Interactive Editor Target: Q4 2026</span>
+                        </div>
+                      </div>
+                    </div>
+                  )}
                 </div>
               </div>
             )}

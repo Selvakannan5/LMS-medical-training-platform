@@ -5,6 +5,7 @@ import { useMutation, useQuery } from '@tanstack/react-query'
 import api from '@/lib/axios'
 import { LoadingSpinner } from '@/components/shared/LoadingSpinner'
 import { useToast } from '@/context/ToastContext'
+import { useAuth } from '@/context/AuthContext'
 
 const DEFAULT_STEPS = [
   'Scene safety assessment',
@@ -21,6 +22,7 @@ export default function OSCEEvaluation() {
   const { sessionId, learnerId } = useParams()
   const toast = useToast()
   const navigate = useNavigate()
+  const { user } = useAuth()
 
   const { data: learners = [] } = useQuery({
     queryKey: ['faculty-learners'],
@@ -76,6 +78,7 @@ export default function OSCEEvaluation() {
 
       return api.post('/faculty/osce/evaluate', {
         learnerId,
+        facultyId: user?.id,
         courseId: data.courseId,
         scenario: data.scenario,
         checklistScores,

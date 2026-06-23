@@ -13,6 +13,12 @@ router.post('/login', async (req, res) => {
   if (!user) {
     return res.status(401).json({ message: 'Account not found. Please register or check your email.' })
   }
+  if (user.status === 'inactive') {
+    return res.status(403).json({ message: 'Your account has been deactivated. Please contact support.' })
+  }
+  if (user.status === 'pending') {
+    return res.status(403).json({ message: 'Your registration is pending admin approval.' })
+  }
   if (!(await user.matchPassword(password))) {
     return res.status(401).json({ message: 'Incorrect password. Please try again.' })
   }
@@ -44,7 +50,8 @@ router.post('/register', async (req, res) => {
       phoneNumber,
       hospital,
       department,
-      role: 'learner'
+      role: 'learner',
+      status: 'pending'
     })
 
     const safeUser = user.toObject()
