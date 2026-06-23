@@ -62,13 +62,13 @@ export default function LearnerDashboard() {
   return (
     <div className="space-y-6 animate-fade-in">
       {/* Welcome banner */}
-      <div className="relative bg-gradient-to-r from-blue-600 to-blue-700 rounded-2xl p-6 overflow-hidden shadow-lg shadow-blue-600/10">
+      <div className="relative bg-gradient-to-r from-blue-600 via-blue-700 to-indigo-750 rounded-2xl p-6 overflow-hidden shadow-lg shadow-blue-600/10">
         <div className="absolute right-0 top-0 w-48 h-48 bg-white/5 rounded-full -translate-y-1/4 translate-x-1/4" />
         <div className="absolute right-16 bottom-0 w-32 h-32 bg-white/5 rounded-full translate-y-1/3" />
         <div className="relative z-10">
-          <p className="text-blue-200 text-sm font-medium mb-1">Welcome back 👋</p>
-          <h1 className="text-2xl sm:text-3xl font-bold text-white mb-1">{user?.name}</h1>
-          <p className="text-blue-200 text-sm">{user?.hospital || 'Apollo Hospitals'} · {user?.department || 'Emergency Medicine'} · {format(new Date(), 'EEEE, MMMM d, yyyy')}</p>
+          <p className="text-blue-200 text-xs font-semibold uppercase tracking-wider mb-1">Welcome back 👋</p>
+          <h1 className="text-2xl sm:text-3xl font-black text-white mb-1">{user?.name}</h1>
+          <p className="text-blue-200 text-xs font-medium">{user?.hospital || 'Apollo Hospitals'} · {user?.department || 'Emergency Medicine'} · {format(new Date(), 'EEEE, MMMM d, yyyy')}</p>
         </div>
       </div>
 
@@ -164,19 +164,39 @@ export default function LearnerDashboard() {
                 {completedCourses.map((c) => (
                   <div
                     key={c.courseId}
-                    className="bg-emerald-50/20 border border-emerald-100 rounded-2xl p-5 flex items-center justify-between"
+                    className="bg-white border border-emerald-100 rounded-2xl p-5 shadow-sm flex flex-col sm:flex-row sm:items-center justify-between gap-4 hover:border-emerald-250 hover:shadow-md transition-all group animate-fade-in"
                   >
-                    <div>
-                      <span className="inline-flex px-2 py-0.5 bg-green-50 text-green-700 text-xs font-bold rounded border border-green-100 mb-1.5">{c.programCode}</span>
-                      <h3 className="font-semibold text-slate-800">{c.courseName}</h3>
-                      <p className="text-xs text-emerald-600 font-medium mt-0.5">Completed & Certified</p>
+                    <div className="flex-1 min-w-0">
+                      <div className="flex items-center gap-2 mb-1.5">
+                        <span className="inline-flex px-2 py-0.5 bg-green-50 text-green-750 text-xs font-bold rounded border border-green-100">{c.programCode}</span>
+                        <span className="inline-flex items-center gap-1 px-2 py-0.5 bg-emerald-50 text-emerald-700 text-[10px] font-bold rounded-full border border-emerald-100">
+                          <span>✓</span> Completed
+                        </span>
+                      </div>
+                      <h3 className="font-semibold text-slate-800 group-hover:text-emerald-700 transition-colors">{c.courseName}</h3>
+                      
+                      <div className="mt-3 flex items-center gap-3">
+                        <div className="flex-1 max-w-[200px]">
+                          <ProgressBar value={100} color="green" showPercent={false} />
+                        </div>
+                        <span className="text-xs text-emerald-600 font-bold">100%</span>
+                      </div>
                     </div>
-                    <Link
-                      to="/learner/certificates"
-                      className="px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold rounded-xl transition-colors shadow-sm"
-                    >
-                      View Certificate
-                    </Link>
+
+                    <div className="flex items-center gap-2 self-end sm:self-auto">
+                      <Link
+                        to={`/learner/course/${c.courseId}`}
+                        className="px-3.5 py-2 bg-slate-50 hover:bg-slate-100 text-slate-700 text-xs font-bold rounded-xl transition-all border border-slate-200"
+                      >
+                        Review Materials
+                      </Link>
+                      <Link
+                        to="/learner/certificates"
+                        className="px-4 py-2 bg-emerald-650 hover:bg-emerald-700 text-white text-xs font-bold rounded-xl transition-all shadow-sm shadow-emerald-600/20"
+                      >
+                        View Certificate
+                      </Link>
+                    </div>
                   </div>
                 ))}
               </div>

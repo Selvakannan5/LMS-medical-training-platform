@@ -204,6 +204,7 @@ router.post('/osce/evaluate', protect, async (req, res) => {
   try {
     const {
       learnerId,
+      facultyId,
       courseId,
       scenario,
       checklistScores,
@@ -214,7 +215,7 @@ router.post('/osce/evaluate', protect, async (req, res) => {
       comments
     } = req.body
 
-    const facultyId = req.user.id
+    const activeFacultyId = facultyId || req.user.id
 
     if (!learnerId || !courseId || !scenario) {
       return res.status(400).json({ message: 'learnerId, courseId, and scenario are required' })
@@ -230,7 +231,7 @@ router.post('/osce/evaluate', protect, async (req, res) => {
 
     const evaluation = await OSCEEvaluation.create({
       learnerId,
-      facultyId,
+      facultyId: activeFacultyId,
       courseId,
       scenario,
       checklistScores: checklistScores || [],
@@ -259,7 +260,7 @@ router.post('/osce/evaluate', protect, async (req, res) => {
         learnerId,
         type: 'osce_evaluation',
         message: `Your OSCE Evaluation for ${courseName} is completed. Status: ${status.toUpperCase()}. Click here to review.`,
-        link: `/learner/osce/s1/${learnerId}`,
+        link: '/learner/osce-results',
         read: false,
         createdAt: new Date().toISOString()
       })

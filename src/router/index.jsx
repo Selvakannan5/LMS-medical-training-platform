@@ -73,6 +73,7 @@ export const router = createBrowserRouter([
       { path: 'course/:id',      element: <Suspense fallback={<Fallback />}><CourseView /></Suspense> },
       { path: 'assessment/:id',  element: <Suspense fallback={<Fallback />}><AssessmentPage /></Suspense> },
       { path: 'osce/:sessionId/:learnerId', element: <Suspense fallback={<Fallback />}><OSCEView /></Suspense> },
+      { path: 'osce-results',    element: <Suspense fallback={<Fallback />}><OSCEView /></Suspense> },
       { path: 'certificates',    element: <Suspense fallback={<Fallback />}><Certificates /></Suspense> },
       { path: 'profile',         element: <Suspense fallback={<Fallback />}><LearnerProfile /></Suspense> },
     ],

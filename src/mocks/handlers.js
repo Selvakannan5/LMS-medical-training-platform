@@ -99,6 +99,25 @@ export const handlers = [
     return HttpResponse.json(result)
   }),
 
+  http.get(`${BASE}/learner/osce/:learnerId`, async ({ params }) => {
+    await delay(D)
+    const results = mockOSCEResults.filter((r) => r.learnerId === params.learnerId)
+    const sorted = [...results].sort((a, b) => new Date(b.submittedAt) - new Date(a.submittedAt))
+    
+    const mapped = sorted.map((e) => ({
+      ...e,
+      submittedAt: e.submittedAt || e.createdAt,
+      overallResult: e.overallResult || e.status,
+      steps: e.steps || (e.checklistScores || []).map((scoreObj, idx) => ({
+        id: `step${idx + 1}`,
+        description: scoreObj.item,
+        result: scoreObj.score === 1 ? 'pass' : 'fail',
+        notes: ''
+      }))
+    }))
+    return HttpResponse.json(mapped)
+  }),
+
   http.get(`${BASE}/learner/certificates`, async ({ request }) => {
     await delay(D)
     const user = getUser(request)
@@ -138,9 +157,39 @@ export const handlers = [
     return HttpResponse.json({ batch: { ...batch, programName: prog?.name }, learners })
   }),
 
-  http.post(`${BASE}/osce/:sessionId/evaluate`, async ({ request }) => {
+  http.post(`${BASE}/faculty/osce/evaluate`, async ({ request }) => {
     await delay(D * 2)
-    return HttpResponse.json({ success: true, message: 'OSCE evaluation submitted successfully' })
+    const body = await request.json()
+    const comm = parseFloat(body.communicationScore) || 0
+    const tech = parseFloat(body.technicalScore) || 0
+    const dec = parseFloat(body.decisionMakingScore) || 0
+    const saf = parseFloat(body.safetyScore) || 0
+    const finalScore = Math.round(((comm + tech + dec + saf) / 4) * 10) / 10
+    const overallResult = finalScore >= 7 ? 'pass' : 'fail'
+    
+    const newEval = {
+      id: 'osce_' + Date.now(),
+      sessionId: 's1',
+      learnerId: body.learnerId,
+      facultyId: body.facultyId || 'f1',
+      courseId: body.courseId,
+      scenario: body.scenario,
+      submittedAt: new Date().toISOString(),
+      overallResult,
+      steps: (body.checklistScores || []).map((cs, idx) => ({
+        id: `step${idx + 1}`,
+        description: cs.item,
+        result: cs.score === 1 ? 'pass' : 'fail',
+        notes: ''
+      })),
+      communicationScore: comm,
+      technicalScore: tech,
+      decisionMakingScore: dec,
+      safetyScore: saf,
+      comments: body.comments || ''
+    }
+    mockOSCEResults.push(newEval)
+    return HttpResponse.json({ success: true, evaluation: newEval })
   }),
 
   http.get(`${BASE}/faculty/assessments`, async () => {

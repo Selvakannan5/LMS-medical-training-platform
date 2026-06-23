@@ -1,10 +1,13 @@
 import express from 'express'
+import mongoose from 'mongoose'
 import { protect } from '../middleware.js'
 import CourseProgress from '../models/CourseProgress.js'
 import Course from '../models/Course.js'
 import Program from '../models/Program.js'
 import Enrollment from '../models/Enrollment.js'
 import { Certificate, Simulation, Notification } from '../models/SimpleModels.js'
+import User from '../models/User.js'
+import OSCEEvaluation from '../models/OSCEEvaluation.js'
 
 const router = express.Router()
 
@@ -144,6 +147,86 @@ router.get('/notifications', protect, async (req, res) => {
   } catch (error) {
     console.error('Fetch notifications error:', error)
     res.status(500).json({ message: 'Server error loading notifications' })
+  }
+})
+
+// GET /osce/:learnerId - Get learner-specific OSCE evaluations
+router.get('/osce/:learnerId', protect, async (req, res) => {
+  try {
+    const { learnerId } = req.params
+
+    // Security check: learners can only view their own evaluations, faculty/admin can view any
+    if (req.user.role === 'learner' && req.user.id !== learnerId) {
+      return res.status(403).json({ message: 'Access denied: You can only view your own OSCE evaluations' })
+    }
+
+    const evaluations = await OSCEEvaluation.find({ learnerId })
+      .sort({ createdAt: -1 })
+      .lean()
+
+    const mapped = await Promise.all(
+      evaluations.map(async (e) => {
+        const course = await Course.findOne({ id: e.courseId }).lean()
+        const faculty = await User.findOne({ id: e.facultyId }).lean()
+        
+        // Map checklistScores back to the frontend-expected steps structure
+        const steps = (e.checklistScores || []).map((scoreObj, idx) => ({
+          id: `step${idx + 1}`,
+          description: scoreObj.item,
+          result: scoreObj.score === 1 ? 'pass' : 'fail',
+          notes: ''
+        }))
+
+        return {
+          ...e,
+          submittedAt: e.createdAt,
+          overallResult: e.status,
+          courseName: course?.name || 'Unknown Course',
+          facultyName: faculty?.name || 'Unknown Faculty',
+          steps
+        }
+      })
+    )
+
+    res.json(mapped)
+  } catch (error) {
+    console.error('Fetch learner OSCE error:', error)
+    res.status(500).json({ message: 'Server error loading OSCE evaluations' })
+  }
+})
+
+// POST /notifications/:id/read - Mark a notification as read
+router.post('/notifications/:id/read', protect, async (req, res) => {
+  try {
+    const { id } = req.params
+    const query = mongoose.Types.ObjectId.isValid(id) ? { _id: id } : { id: id }
+    await Notification.updateOne(query, { $set: { read: true } })
+    res.json({ success: true })
+  } catch (error) {
+    console.error('Mark notification as read error:', error)
+    res.status(500).json({ message: 'Server error marking notification as read' })
+  }
+})
+
+// POST /notifications/read-all - Mark all notifications for the learner as read
+router.post('/notifications/read-all', protect, async (req, res) => {
+  try {
+    const learnerId = req.user.id
+    await Notification.updateMany(
+      {
+        $or: [
+          { learnerId },
+          { learnerId: { $exists: false } },
+          { learnerId: null }
+        ],
+        read: false
+      },
+      { $set: { read: true } }
+    )
+    res.json({ success: true })
+  } catch (error) {
+    console.error('Mark all notifications as read error:', error)
+    res.status(500).json({ message: 'Server error marking all notifications as read' })
   }
 })
 

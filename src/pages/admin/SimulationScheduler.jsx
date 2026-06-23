@@ -7,6 +7,7 @@ import api from '@/lib/axios'
 import { LoadingSpinner } from '@/components/shared/LoadingSpinner'
 import { StatusBadge } from '@/components/shared/StatusBadge'
 import { useToast } from '@/context/ToastContext'
+import { ConfirmModal } from '@/components/shared/ConfirmModal'
 import { queryClient } from '@/lib/queryClient'
 import { format, startOfMonth, endOfMonth, eachDayOfInterval, isSameMonth, isToday, isSameDay } from 'date-fns'
 
@@ -16,6 +17,7 @@ const schema = z.object({
   date:     z.string().min(1, 'Date required'),
   time:     z.string().min(1, 'Time required'),
   room:     z.string().min(1, 'Room required'),
+  faculty:  z.string().optional()
 })
 
 const VIEWS = ['month', 'week']
@@ -25,6 +27,8 @@ export default function SimulationScheduler() {
   const [view, setView] = useState('month')
   const [currentDate, setCurrentDate] = useState(new Date())
   const [showForm, setShowForm] = useState(false)
+  const [editingSim, setEditingSim] = useState(null)
+  const [confirmDeleteSim, setConfirmDeleteSim] = useState(null)
 
   const { data: simulations = [], isLoading } = useQuery({
     queryKey: ['admin-simulations'],
@@ -49,6 +53,27 @@ export default function SimulationScheduler() {
       queryClient.invalidateQueries(['admin-simulations'])
     },
     onError: () => toast.error('Failed to schedule session'),
+  })
+
+  const updateMutation = useMutation({
+    mutationFn: ({ id, ...data }) => api.patch(`/admin/simulations/${id}`, data),
+    onSuccess: () => {
+      toast.success('Simulation session updated!')
+      setShowForm(false)
+      setEditingSim(null)
+      queryClient.invalidateQueries(['admin-simulations'])
+    },
+    onError: () => toast.error('Failed to update session'),
+  })
+
+  const deleteMutation = useMutation({
+    mutationFn: (id) => api.delete(`/admin/simulations/${id}`),
+    onSuccess: () => {
+      toast.success('Simulation session cancelled!')
+      setConfirmDeleteSim(null)
+      queryClient.invalidateQueries(['admin-simulations'])
+    },
+    onError: () => toast.error('Failed to cancel session'),
   })
 
   const { register, handleSubmit, formState: { errors }, reset } = useForm({ resolver: zodResolver(schema) })
@@ -77,7 +102,7 @@ export default function SimulationScheduler() {
               {v}
             </button>
           ))}
-          <button id="schedule-session-btn" onClick={() => { setShowForm(true); reset() }} className="px-4 py-1.5 bg-blue-600 text-white text-xs font-semibold rounded-lg hover:bg-blue-700 transition-colors">
+          <button id="schedule-session-btn" onClick={() => { setShowForm(true); setEditingSim(null); reset({ scenario: '', batchId: '', date: '', time: '', room: '', faculty: '' }); }} className="px-4 py-1.5 bg-blue-600 text-white text-xs font-semibold rounded-lg hover:bg-blue-700 transition-colors">
             + New Session
           </button>
         </div>
@@ -149,8 +174,31 @@ export default function SimulationScheduler() {
                   <td className="px-4 py-3 text-slate-500 whitespace-nowrap">{s.facultyName}</td>
                   <td className="px-4 py-3"><StatusBadge status={s.status} /></td>
                   <td className="px-4 py-3 flex gap-2">
-                    <button onClick={() => toast.info('Edit (coming soon)')} className="px-2 py-1 bg-blue-100 text-blue-700 text-xs rounded-lg hover:bg-blue-200" id={`edit-sim-${s.id}`}>Edit</button>
-                    <button onClick={() => toast.warn('Session cancelled')} className="px-2 py-1 bg-red-100 text-red-600 text-xs rounded-lg hover:bg-red-200" id={`cancel-sim-${s.id}`}>Cancel</button>
+                    <button
+                      onClick={() => {
+                        setEditingSim(s)
+                        setShowForm(true)
+                        reset({
+                          scenario: s.scenario,
+                          batchId: s.batchId,
+                          date: s.date,
+                          time: s.time,
+                          room: s.room,
+                          faculty: s.faculty || ''
+                        })
+                      }}
+                      className="px-2 py-1 bg-blue-100 text-blue-700 text-xs rounded-lg hover:bg-blue-200"
+                      id={`edit-sim-${s.id}`}
+                    >
+                      Edit
+                    </button>
+                    <button
+                      onClick={() => setConfirmDeleteSim(s)}
+                      className="px-2 py-1 bg-red-100 text-red-600 text-xs rounded-lg hover:bg-red-200"
+                      id={`cancel-sim-${s.id}`}
+                    >
+                      Cancel
+                    </button>
                   </td>
                 </tr>
               ))}
@@ -159,11 +207,11 @@ export default function SimulationScheduler() {
         </div>
       </div>
 
-      {/* Create form */}
+      {/* Create / Edit form */}
       {showForm && (
         <div className="bg-white rounded-2xl shadow-sm border border-slate-100 p-6">
-          <h2 className="font-bold text-slate-800 mb-5 text-lg">Schedule New Session</h2>
-          <form onSubmit={handleSubmit(data => createMutation.mutate(data))} id="create-simulation-form" className="space-y-4">
+          <h2 className="font-bold text-slate-800 mb-5 text-lg">{editingSim ? 'Edit Session' : 'Schedule New Session'}</h2>
+          <form onSubmit={handleSubmit(data => editingSim ? updateMutation.mutate({ id: editingSim.id, ...data }) : createMutation.mutate(data))} id="create-simulation-form" className="space-y-4">
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div>
                 <label className="block text-sm font-medium text-slate-700 mb-1.5">Scenario</label>
@@ -202,15 +250,25 @@ export default function SimulationScheduler() {
               </div>
             </div>
             <div className="flex gap-3 pt-2">
-              <button type="submit" disabled={createMutation.isPending} id="submit-simulation-btn" className="px-5 py-2.5 bg-blue-600 text-white text-sm font-semibold rounded-xl hover:bg-blue-700 disabled:opacity-70 transition-colors flex items-center gap-2">
-                {createMutation.isPending && <LoadingSpinner size="sm" color="text-white" />}
-                Schedule Session
+              <button type="submit" disabled={createMutation.isPending || updateMutation.isPending} id="submit-simulation-btn" className="px-5 py-2.5 bg-blue-600 text-white text-sm font-semibold rounded-xl hover:bg-blue-700 disabled:opacity-70 transition-colors flex items-center gap-2">
+                {(createMutation.isPending || updateMutation.isPending) && <LoadingSpinner size="sm" color="text-white" />}
+                {editingSim ? 'Save Changes' : 'Schedule Session'}
               </button>
-              <button type="button" onClick={() => setShowForm(false)} className="px-5 py-2.5 border border-slate-200 text-slate-600 text-sm font-medium rounded-xl hover:bg-slate-50">Cancel</button>
+              <button type="button" onClick={() => { setShowForm(false); setEditingSim(null); }} className="px-5 py-2.5 border border-slate-200 text-slate-600 text-sm font-medium rounded-xl hover:bg-slate-50">Cancel</button>
             </div>
           </form>
         </div>
       )}
+
+      <ConfirmModal
+        isOpen={!!confirmDeleteSim}
+        title="Cancel Simulation Session"
+        message={`Are you sure you want to cancel the session "${confirmDeleteSim?.scenario}"?`}
+        confirmLabel="Cancel Session"
+        danger
+        onConfirm={() => deleteMutation.mutate(confirmDeleteSim.id)}
+        onCancel={() => setConfirmDeleteSim(null)}
+      />
     </div>
   )
 }

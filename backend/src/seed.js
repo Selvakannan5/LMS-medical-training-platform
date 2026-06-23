@@ -24,6 +24,7 @@ const users = [
     email: 'learner@demo.com', 
     password, 
     role: 'learner', 
+    status: 'active',
     phoneNumber: '9876543210', 
     hospital: 'Apollo Hospitals', 
     department: 'Emergency Medicine' 
@@ -34,6 +35,7 @@ const users = [
     email: 'learner2@demo.com', 
     password, 
     role: 'learner', 
+    status: 'active',
     phoneNumber: '9876543213', 
     hospital: 'Apollo Hospitals', 
     department: 'ICU' 
@@ -44,6 +46,7 @@ const users = [
     email: 'learner3@demo.com', 
     password, 
     role: 'learner', 
+    status: 'active',
     phoneNumber: '9876543214', 
     hospital: 'Apollo Hospitals', 
     department: 'Pediatrics' 
@@ -54,6 +57,7 @@ const users = [
     email: 'faculty@demo.com', 
     password, 
     role: 'faculty', 
+    status: 'active',
     phoneNumber: '9876543211', 
     hospital: 'Apollo Hospitals', 
     department: 'Pediatrics' 
@@ -64,6 +68,7 @@ const users = [
     email: 'admin@demo.com', 
     password, 
     role: 'admin', 
+    status: 'active',
     phoneNumber: '9876543212', 
     hospital: 'Admin HQ', 
     department: 'Training Admin' 
@@ -183,7 +188,35 @@ const osceEvaluations = [
   }
 ]
 
-const certificates = []
+const certificates = [
+  {
+    id: 'cert_seed_1',
+    learnerId: 'u1',
+    courseId: 'c1',
+    programName: 'Basic Life Support',
+    status: 'valid',
+    issueDate: '2026-06-01',
+    expiryDate: '2028-06-01'
+  },
+  {
+    id: 'cert_seed_2',
+    learnerId: 'u2',
+    courseId: 'c1',
+    programName: 'Basic Life Support',
+    status: 'valid',
+    issueDate: '2024-06-25',
+    expiryDate: '2026-06-25'
+  },
+  {
+    id: 'cert_seed_3',
+    learnerId: 'u3',
+    courseId: 'c2',
+    programName: 'Advanced Cardiovascular Life Support',
+    status: 'expired',
+    issueDate: '2023-01-01',
+    expiryDate: '2025-01-01'
+  }
+]
 const batches = [
   { 
     id: 'b1', 

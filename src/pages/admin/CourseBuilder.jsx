@@ -23,6 +23,7 @@ export default function CourseBuilder() {
   const toast = useToast()
   const [showForm, setShowForm] = useState(false)
   const [archiveTarget, setArchiveTarget] = useState(null)
+  const [editingCourse, setEditingCourse] = useState(null)
   const [modules, setModules] = useState([{ id: Date.now(), title: '', type: 'video', file: '' }])
   const [dragIdx, setDragIdx] = useState(null)
 
@@ -39,6 +40,27 @@ export default function CourseBuilder() {
       queryClient.invalidateQueries(['admin-courses'])
     },
     onError: () => toast.error('Failed to create course'),
+  })
+
+  const updateMutation = useMutation({
+    mutationFn: ({ id, ...data }) => api.patch(`/admin/courses/${id}`, { ...data, modules }),
+    onSuccess: () => {
+      toast.success('Course updated successfully!')
+      setShowForm(false)
+      setEditingCourse(null)
+      queryClient.invalidateQueries(['admin-courses'])
+    },
+    onError: () => toast.error('Failed to update course'),
+  })
+
+  const deleteMutation = useMutation({
+    mutationFn: (id) => api.delete(`/admin/courses/${id}`),
+    onSuccess: () => {
+      toast.success('Course deleted successfully!')
+      setArchiveTarget(null)
+      queryClient.invalidateQueries(['admin-courses'])
+    },
+    onError: () => toast.error('Failed to delete course'),
   })
 
   const { register, handleSubmit, formState: { errors }, reset } = useForm({ resolver: zodResolver(schema) })
@@ -60,6 +82,31 @@ export default function CourseBuilder() {
     })
   }
 
+  const handleEditClick = async (p) => {
+    try {
+      const detailed = await api.get(`/admin/courses/${p.id}`).then(r => r.data)
+      setEditingCourse(detailed)
+      setShowForm(true)
+      reset({
+        name: detailed.name,
+        code: detailed.code,
+        description: detailed.description
+      })
+      if (detailed.modulesList && detailed.modulesList.length > 0) {
+        setModules(detailed.modulesList.map((m, i) => ({
+          id: m.id || i,
+          title: m.title,
+          type: m.type,
+          file: m.contentUrl || ''
+        })))
+      } else {
+        setModules([{ id: Date.now(), title: '', type: 'video', file: '' }])
+      }
+    } catch (e) {
+      toast.error('Failed to load course details')
+    }
+  }
+
   if (isLoading) return <div className="flex items-center justify-center h-64"><LoadingSpinner size="lg" /></div>
 
   return (
@@ -71,7 +118,7 @@ export default function CourseBuilder() {
         </div>
         <button
           id="create-course-btn"
-          onClick={() => { setShowForm(true); reset() }}
+          onClick={() => { setShowForm(true); setEditingCourse(null); setModules([{ id: Date.now(), title: '', type: 'video', file: '' }]); reset() }}
           className="px-4 py-2.5 bg-blue-600 text-white text-sm font-semibold rounded-xl hover:bg-blue-700 transition-colors flex items-center gap-2"
         >
           + New Course
@@ -105,7 +152,7 @@ export default function CourseBuilder() {
                 <td className="px-5 py-4 text-slate-500">{p.duration}</td>
                 <td className="px-5 py-4 flex gap-2">
                   <button
-                    onClick={() => toast.info('Edit course (coming soon)')}
+                    onClick={() => handleEditClick(p)}
                     className="px-2.5 py-1 bg-blue-100 text-blue-700 text-xs font-medium rounded-lg hover:bg-blue-200 transition-colors"
                     id={`edit-course-${p.id}`}
                   >
@@ -125,11 +172,11 @@ export default function CourseBuilder() {
         </table>
       </div>
 
-      {/* Create course form */}
+      {/* Create / Edit course form */}
       {showForm && (
         <div className="bg-white rounded-2xl shadow-sm border border-slate-100 p-6">
-          <h2 className="font-bold text-slate-800 mb-5 text-lg">Create New Course</h2>
-          <form onSubmit={handleSubmit(data => createMutation.mutate(data))} id="create-course-form" className="space-y-5">
+          <h2 className="font-bold text-slate-800 mb-5 text-lg">{editingCourse ? 'Edit Course' : 'Create New Course'}</h2>
+          <form onSubmit={handleSubmit(data => editingCourse ? updateMutation.mutate({ id: editingCourse.id, ...data }) : createMutation.mutate(data))} id="create-course-form" className="space-y-5">
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div>
                 <label className="block text-sm font-medium text-slate-700 mb-1.5">Course Name</label>
@@ -138,7 +185,7 @@ export default function CourseBuilder() {
               </div>
               <div>
                 <label className="block text-sm font-medium text-slate-700 mb-1.5">Program Type</label>
-                <select {...register('code')} id="program-type" className="w-full px-4 py-2.5 rounded-xl border border-slate-200 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all bg-white">
+                <select {...register('code')} id="program-type" className="w-full px-4 py-2.5 rounded-xl border border-slate-200 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all bg-white bg-no-repeat">
                   <option value="">Select program…</option>
                   {PROGRAMS.map(p => <option key={p} value={p}>{p}</option>)}
                 </select>
@@ -194,11 +241,11 @@ export default function CourseBuilder() {
             </div>
 
             <div className="flex gap-3 pt-2">
-              <button type="submit" disabled={createMutation.isPending} id="submit-course-btn" className="px-5 py-2.5 bg-blue-600 text-white text-sm font-semibold rounded-xl hover:bg-blue-700 disabled:opacity-70 transition-colors flex items-center gap-2">
-                {createMutation.isPending && <LoadingSpinner size="sm" color="text-white" />}
-                Create Course
+              <button type="submit" disabled={createMutation.isPending || updateMutation.isPending} id="submit-course-btn" className="px-5 py-2.5 bg-blue-600 text-white text-sm font-semibold rounded-xl hover:bg-blue-700 disabled:opacity-70 transition-colors flex items-center gap-2">
+                {(createMutation.isPending || updateMutation.isPending) && <LoadingSpinner size="sm" color="text-white" />}
+                {editingCourse ? 'Save Changes' : 'Create Course'}
               </button>
-              <button type="button" onClick={() => setShowForm(false)} className="px-5 py-2.5 border border-slate-200 text-slate-600 text-sm font-medium rounded-xl hover:bg-slate-50 transition-colors">Cancel</button>
+              <button type="button" onClick={() => { setShowForm(false); setEditingCourse(null); }} className="px-5 py-2.5 border border-slate-200 text-slate-600 text-sm font-medium rounded-xl hover:bg-slate-50 transition-colors">Cancel</button>
             </div>
           </form>
         </div>
@@ -206,11 +253,11 @@ export default function CourseBuilder() {
 
       <ConfirmModal
         isOpen={!!archiveTarget}
-        title="Archive Course"
-        message={`Archive "${archiveTarget?.name}"? It will be hidden from learners but data will be preserved.`}
-        confirmLabel="Archive"
+        title="Delete Course"
+        message={`Are you sure you want to delete "${archiveTarget?.name}"? All associated courses, assessments, and quizzes will be deleted permanently.`}
+        confirmLabel="Delete"
         danger
-        onConfirm={() => { toast.success('Course archived'); setArchiveTarget(null) }}
+        onConfirm={() => deleteMutation.mutate(archiveTarget.id)}
         onCancel={() => setArchiveTarget(null)}
       />
     </div>
